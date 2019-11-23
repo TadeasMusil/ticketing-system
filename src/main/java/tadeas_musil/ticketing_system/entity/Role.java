@@ -1,7 +1,5 @@
 package tadeas_musil.ticketing_system.entity;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;

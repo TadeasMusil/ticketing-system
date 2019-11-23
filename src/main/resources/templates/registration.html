@@ -1,0 +1,72 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: head-fragment}">
+</head>
+
+<body>
+    <div class="auth">
+        <div class="auth-container">
+            <div class="card">
+                <header class="auth-header">
+                    <h1 class="auth-title">
+                        <div class="logo">
+                            <span class="l l1"></span>
+                            <span class="l l2"></span>
+                            <span class="l l3"></span>
+                            <span class="l l4"></span>
+                            <span class="l l5"></span>
+                        </div> Ticketing system
+                    </h1>
+                </header>
+                <div class="auth-content">
+                    <form id="signup-form" th:action="@{/processRegistration}" th:object="${user}" method="post"
+                        novalidate="">
+                        <div class="form-group">
+                            <label for="firstname">Name</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <span class="error-message" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+                                        <input type="text" class="form-control underlined" th:field="*{firstName}" name="firstname" id="firstname" placeholder="Enter first name" required="">
+                                    </div>
+                                    <div class="col-sm-6">
+                                            <span class="error-message" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+                                        <input type="text" class="form-control underlined" th:field="*{lastName}" name="lastname" id="lastname" placeholder="Enter last name" required="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <div class="row error-message" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                                <input type="email" class="form-control underlined" th:field="*{username}" name="email" id="email" placeholder="Enter email address" required="">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <div class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                <div class="row">
+                                        
+                                    <div class="col-sm-6">
+                                        <input type="password" class="form-control underlined" th:field="*{password}" name="password" id="password" placeholder="Enter password" required="">
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type="password" class="form-control underlined" th:field="*{confirmPassword}" name="retype_password" id="retype_password" placeholder="Re-type password" required="">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Sign up" class="btn btn-block btn-primary">
+                            </div>
+                            <div class="form-group">
+                                <p class="text-muted text-center">Already have an account? <a th:href="@{/login}">Login</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <a href="index.html" class="btn btn-secondary btn-sm">
+                        <i class="fa fa-arrow-left"></i> Back to dashboard </a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,11 +1,8 @@
 package tadeas_musil.ticketing_system.entity;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -24,6 +21,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import tadeas_musil.ticketing_system.entity.User.Registration;
+import tadeas_musil.ticketing_system.validation.PasswordMatch;
+import tadeas_musil.ticketing_system.validation.UniqueUsername;
+
 
 
 @Getter
@@ -32,12 +33,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "app_user")
+@PasswordMatch(groups = { Registration.class }, first = "password", second = "confirmPassword")
 public class User {
     
     public interface Registration {
-    };
-
-    public interface Settings {
     };
 
     @Id
@@ -46,7 +45,14 @@ public class User {
 
     @NotBlank(message = "Enter email", groups = { Registration.class })
     @Email(message = "Invalid email format", groups = { Registration.class })
+    @UniqueUsername(groups = { Registration.class })
     private String username;
+
+    @NotBlank(message = "Enter first name", groups = { Registration.class })
+    private String firstName;
+    
+    @NotBlank(message = "Enter last name", groups = { Registration.class })
+    private String lastName;
 
     @NotBlank(message = "Enter password", groups = { Registration.class })
     @Size(min = 8, message = "Password must have at least 8 characters", groups = { Registration.class })
