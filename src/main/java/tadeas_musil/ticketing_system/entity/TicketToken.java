@@ -16,7 +16,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "ticket_event")
 public class TicketToken {
 
     @Id

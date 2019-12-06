@@ -1,20 +1,23 @@
 package tadeas_musil.ticketing_system.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -33,16 +36,15 @@ import tadeas_musil.ticketing_system.validation.UniqueUsername;
 @NoArgsConstructor
 @Entity
 @Table(name = "app_user")
-@PasswordMatch(groups = { Registration.class }, first = "password", second = "confirmPassword")
+@PasswordMatch(groups = { Registration.class }, first = "password", second = "passwordConfirmation")
 public class User {
     
-    public interface Registration {
-    };
+    public interface Registration {};
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+@NotNull
     @NotBlank(message = "Enter email", groups = { Registration.class })
     @Email(message = "Invalid email format", groups = { Registration.class })
     @UniqueUsername(groups = { Registration.class })
@@ -59,13 +61,18 @@ public class User {
     private String password;
 
     @Transient
-    private String confirmPassword;
+    private String passwordConfirmation;
                     
-    @ManyToMany(fetch = FetchType.LAZY ,cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinTable(name = "app_user_show",
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "app_user_role",
                 joinColumns = @JoinColumn(name = "app_user_id"),
                 inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-    
+    @OneToMany( mappedBy = "author", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private List<Ticket> tickets = new ArrayList<>();
+
+    @OneToMany( mappedBy = "author", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private List<TicketEvent> ticketEvents = new ArrayList<>();
+        
 }
