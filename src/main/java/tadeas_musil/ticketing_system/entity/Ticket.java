@@ -12,31 +12,38 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Getter;
 import lombok.Setter;
-import tadeas_musil.ticketing_system.validation.EmailAndIdMatch;
 
 @Getter
 @Setter
 @Entity
-@EmailAndIdMatch(id="id",email = "author")
 public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @NotBlank 
+    private String subject;
 
-    private String title;
-
+    @Valid
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private TicketCategory category;
+    
+    @NotBlank
     private String author;
 
     @CreationTimestamp
     private LocalDateTime date;
 
-    @OneToMany(mappedBy = "ticket", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
+    @OneToMany( cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.REFRESH })
     private List<TicketEvent> events = new ArrayList<>();
 }
