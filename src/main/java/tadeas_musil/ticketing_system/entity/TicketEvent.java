@@ -29,9 +29,8 @@ public class TicketEvent {
 
     private String type;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User author;
+    
+    private String author;
 
     private String content;
 
