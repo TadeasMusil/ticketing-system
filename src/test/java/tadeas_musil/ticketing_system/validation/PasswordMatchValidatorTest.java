@@ -33,12 +33,12 @@ public class PasswordMatchValidatorTest {
         user.setFirstName("firstName");
         user.setLastName("lastName");
         user.setPassword("password");
-        user.setConfirmPassword("password");
+        user.setPasswordConfirmation("password");
         return user;
     }
 
     @Test
-    public void validation_shouldReturnNoViolation_givenNewUser() {
+    public void registrationValidation_shouldReturnNoViolation_givenNewUser() {
         User user = getUserPassingAllValidations();
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
 
@@ -48,7 +48,7 @@ public class PasswordMatchValidatorTest {
     }
 
     @Test
-    public void validation_shouldReturnViolation_givenExistingUser() {
+    public void registrationValidation_shouldReturnViolation_givenExistingUser() {
         User user = getUserPassingAllValidations();
         when(userRepository.existsByUsername(anyString())).thenReturn(true);
 
@@ -61,7 +61,7 @@ public class PasswordMatchValidatorTest {
     }
 
     @Test
-    public void validation_shouldReturnViolation_givenWrongUsernameFormat() {
+    public void registrationValidation_shouldReturnViolation_givenWrongUsernameFormat() {
         User user = getUserPassingAllValidations();
         user.setUsername("notAnEmail");
 
@@ -74,7 +74,7 @@ public class PasswordMatchValidatorTest {
     }
 
     @Test
-    public void validation_shouldReturnViolation_givenEmptyFirstName() {
+    public void registrationValidation_shouldReturnViolation_givenEmptyFirstName() {
         User user = getUserPassingAllValidations();
         user.setFirstName("  ");
 
@@ -87,7 +87,7 @@ public class PasswordMatchValidatorTest {
     }
 
     @Test
-    public void validation_shouldReturnViolation_givenEmptyLastName() {
+    public void registrationValidation_shouldReturnViolation_givenEmptyLastName() {
         User user = getUserPassingAllValidations();
         user.setLastName("  ");
 
@@ -100,10 +100,10 @@ public class PasswordMatchValidatorTest {
     }
 
     @Test
-    public void validation_shouldReturnViolation_givenNoPassword() {
+    public void registrationValidation_shouldReturnViolation_givenNoPassword() {
         User user = getUserPassingAllValidations();
         user.setPassword(null);
-        user.setConfirmPassword(null);
+        user.setPasswordConfirmation(null);
         Set<ConstraintViolation<User>> violations = validator.validate(user, Registration.class);
 
         assertThat(violations).hasSize(1)
@@ -113,10 +113,10 @@ public class PasswordMatchValidatorTest {
     }
 
     @Test
-    public void validation_shouldReturnViolation_givenShortPassword() {
+    public void registrationValidation_shouldReturnViolation_givenShortPassword() {
         User user = getUserPassingAllValidations();
         user.setPassword("short");
-        user.setConfirmPassword("short");
+        user.setPasswordConfirmation("short");
         
         Set<ConstraintViolation<User>> violations = validator.validate(user, Registration.class);
 
@@ -127,9 +127,9 @@ public class PasswordMatchValidatorTest {
     }
 
     @Test
-    public void validation_shouldReturnViolation_givenDifferentPasswords() {
+    public void registrationValidation_shouldReturnViolation_givenDifferentPasswords() {
         User user = getUserPassingAllValidations();
-        user.setConfirmPassword("differentPassword");
+        user.setPasswordConfirmation("differentPassword");
         
         Set<ConstraintViolation<User>> violations = validator.validate(user, Registration.class);
 

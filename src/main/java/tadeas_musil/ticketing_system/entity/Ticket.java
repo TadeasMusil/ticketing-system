@@ -17,10 +17,12 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Getter;
 import lombok.Setter;
+import tadeas_musil.ticketing_system.validation.EmailAndIdMatch;
 
 @Getter
 @Setter
 @Entity
+@EmailAndIdMatch(id="id",email = "author")
 public class Ticket {
 
     @Id
@@ -29,9 +31,7 @@ public class Ticket {
 
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User author;
+    private String author;
 
     @CreationTimestamp
     private LocalDateTime date;
@@ -39,5 +39,4 @@ public class Ticket {
     @OneToMany(mappedBy = "ticket", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.REFRESH })
     private List<TicketEvent> events = new ArrayList<>();
-
 }
