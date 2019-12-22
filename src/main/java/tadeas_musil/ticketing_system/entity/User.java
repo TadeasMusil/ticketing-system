@@ -77,5 +77,13 @@ public class User {
     @OneToMany( cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
     private List<TicketEvent> ticketEvents = new ArrayList<>();
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(name = "app_user_department",
+                joinColumns = @JoinColumn(name = "app_user_id"),
+                inverseJoinColumns = @JoinColumn(name = "department_name"))
+    private List<Department> departments = new ArrayList<>();
+
+
         
 }
