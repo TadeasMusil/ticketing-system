@@ -20,6 +20,8 @@ public class EmailAndIdMatchValidator implements ConstraintValidator<EmailAndIdM
 
     @Override
     public boolean isValid(TicketAccessForm form, ConstraintValidatorContext context) {
+        if(containsNullField(form)) return false;
+        
         if (ticketRepository.existsById(form.getTicketId())) {
             return ticketRepository.findById(form.getTicketId())
                                     .get()
@@ -28,5 +30,11 @@ public class EmailAndIdMatchValidator implements ConstraintValidator<EmailAndIdM
         }
         return false;
 
+    }
+    private boolean containsNullField(TicketAccessForm form){
+        if (form.getAuthorEmail() == null || form.getTicketId() == null){
+            return true;
+        }
+        return false;
     }
 }

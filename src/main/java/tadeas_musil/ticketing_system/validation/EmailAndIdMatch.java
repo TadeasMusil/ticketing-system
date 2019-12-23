@@ -17,7 +17,7 @@ public @interface EmailAndIdMatch {
 
     String id();
 
-    String message() default "Email and ticket number do not match";
+    String message() default "Email and ticket ID don't match";
 
     @Target({ ElementType.PARAMETER,ElementType.ANNOTATION_TYPE })
     @Retention(RetentionPolicy.RUNTIME)

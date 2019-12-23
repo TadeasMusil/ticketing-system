@@ -9,4 +9,6 @@ public interface TicketTokenService {
 
     TicketToken createToken(Long ticketId);
 
+    boolean validateToken(Long ticketId, String token);
+
 }

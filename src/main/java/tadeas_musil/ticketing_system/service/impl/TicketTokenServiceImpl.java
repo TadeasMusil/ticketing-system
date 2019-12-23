@@ -1,11 +1,12 @@
 package tadeas_musil.ticketing_system.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketToken;
 import tadeas_musil.ticketing_system.helper.LocalDateTimeHelper;
@@ -15,20 +16,17 @@ import tadeas_musil.ticketing_system.repository.TicketTokenRepository;
 import tadeas_musil.ticketing_system.service.TicketTokenService;
 
 @Service
+@RequiredArgsConstructor
 public class TicketTokenServiceImpl implements TicketTokenService {
 
-    @Autowired
-    private TicketRepository ticketRepository;
+    private final TicketRepository ticketRepository;
 
-    @Autowired
-    private TicketTokenRepository ticketTokenRepository;
+    private final TicketTokenRepository ticketTokenRepository;
 
-    @Autowired
-    private UUIDHelper uuidHelper;
+    private final UUIDHelper uuidHelper;
 
-    @Autowired
-    private LocalDateTimeHelper localDateTimeHelper;
-    
+    private final LocalDateTimeHelper localDateTimeHelper;
+
     @Value("${ticket_token.duration}")
     private int tokenDuration;
 
@@ -42,7 +40,25 @@ public class TicketTokenServiceImpl implements TicketTokenService {
         return ticketTokenRepository.save(token);
     }
 
-    private LocalDateTime createExpiryDate(){
+    private LocalDateTime createExpiryDate() {
         return localDateTimeHelper.getCurrentDateTime().plusHours(tokenDuration);
+    }
+
+    @Override
+    public boolean validateToken(Long ticketId, String ticketToken) {
+        Optional<TicketToken> token = ticketTokenRepository.findByToken(ticketToken);
+
+        if (token.isPresent() && tokenNotExpired(token.get().getExpiryDate())
+                                && token.get().getTicket().getId().equals(ticketId)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean tokenNotExpired(LocalDateTime expiryDate) {
+        if (localDateTimeHelper.getCurrentDateTime().compareTo(expiryDate) > 0) {
+            return false;
+        }
+        return true;
     }
 }

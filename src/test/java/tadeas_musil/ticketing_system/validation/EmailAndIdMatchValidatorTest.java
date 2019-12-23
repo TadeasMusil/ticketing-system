@@ -38,7 +38,6 @@ public class EmailAndIdMatchValidatorTest {
     public void validation_shouldReturnNoError_givenMatchingTicketAndAuthor() {
         TicketAccessForm form = getFormPassingAllValidations();
         Ticket ticket = new Ticket();
-        String author = new String();
         ticket.setAuthor(form.getAuthorEmail());
        
         when(ticketRepository.existsById(anyLong())).thenReturn(true);
