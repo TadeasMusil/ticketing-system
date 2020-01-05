@@ -54,6 +54,8 @@ public class Ticket {
     @NotBlank
     private String author;
 
+    private String owner;
+
     @CreationTimestamp
     private LocalDateTime date;
     
