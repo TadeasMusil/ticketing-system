@@ -61,7 +61,7 @@ public class TicketPermissionEvaluatorTest {
         Ticket ticket = new Ticket();
 
         boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), "ticket", "read");
+                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "read");
 
         assertThat(hasPermission).isFalse();
     }
