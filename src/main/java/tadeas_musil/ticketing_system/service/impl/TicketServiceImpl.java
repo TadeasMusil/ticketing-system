@@ -2,36 +2,38 @@ package tadeas_musil.ticketing_system.service.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import javax.mail.MessagingException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketToken;
-import tadeas_musil.ticketing_system.entity.User;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
 import tadeas_musil.ticketing_system.service.EmailService;
 import tadeas_musil.ticketing_system.service.TicketService;
 import tadeas_musil.ticketing_system.service.TicketTokenService;
 
-@Service("ticketServiceImpl")
+@Service()
+@RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
-    @Autowired
-    private UserRepository userRepository;
     
-    @Autowired
-    private TicketRepository ticketRepository;
+    private final UserRepository userRepository;
+    
+    
+    private final TicketRepository ticketRepository;
 
-    @Autowired
-    private EmailService emailService;
+    
+    private final EmailService emailService;
 
-    @Autowired
-    private TicketTokenService ticketTokenService;
+    
+    private final TicketTokenService ticketTokenService;
 
     @Value("${ticket.access_email.subject}")
     private String accessEmailSubject;
@@ -52,7 +54,14 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Ticket createTicket(Ticket ticket) {
-       return ticketRepository.save(ticket);
-        
+        return ticketRepository.save(ticket);
     }
+
+    @Override
+    public Ticket getById(Long id) {
+        return ticketRepository.findByIdAndFetchEvents(id)
+        .orElseThrow(() -> new NoSuchElementException("Ticket with ID: " + id + " doesn't exist"));
+    }
+    
+    
 }
