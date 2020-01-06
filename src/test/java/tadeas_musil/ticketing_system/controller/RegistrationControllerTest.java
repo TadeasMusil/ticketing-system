@@ -11,8 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,8 +19,7 @@ import tadeas_musil.ticketing_system.repository.UserRepository;
 import tadeas_musil.ticketing_system.service.UserService;
 
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(RegistrationController.class)
 public class RegistrationControllerTest {
     
     @Autowired
@@ -46,7 +44,7 @@ public class RegistrationControllerTest {
         mockMvc.perform(post("/processRegistration")
             .param("username", "joe@email.com")
             .param("password", "password")
-            .param("confirmPassword", "password")
+            .param("passwordConfirmation", "password")
             .with(csrf()))
         .andExpect(status().isOk())
     	.andExpect(view().name("registration"));
@@ -59,7 +57,7 @@ public class RegistrationControllerTest {
             .param("lastName", "LastName")
             .param("username", "user@email.com")
             .param("password", "password")
-            .param("confirmPassword", "differentPassword")
+            .param("passwordConfirmation", "differentPassword")
             .with(csrf()))
         .andExpect(status().isOk())
         .andExpect(model().attributeHasFieldErrors("user", "password"))
@@ -73,7 +71,7 @@ public class RegistrationControllerTest {
         mockMvc.perform(post("/processRegistration")
             .param("username", "username")
             .param("password", "password")
-            .param("confirmPassword", "password")
+            .param("passwordConfirmation", "password")
             .with(csrf()))
         .andExpect(status().isOk())
         .andExpect(model().attributeHasErrors("user"))
