@@ -56,7 +56,7 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithAnonymousUser
+   
     public void hasPermission_shouldReturnFalse_givenAnonymousUser() {
         Ticket ticket = new Ticket();
 
@@ -87,13 +87,14 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(roles = "STAFF")
-    public void hasPermission_shouldReturnTrue_givenPermissionReadAndRoleStaffAndSameDepartment() {
+    @WithMockUser(username = "username", roles = "STAFF")
+    public void hasPermission_shouldReturnTrue_givenPermissionReadAndRoleStaffAndMatchingDepartment() {
         Department department = new Department();
         department.setName("departmentName");
 
         Ticket ticket = new Ticket();
         ticket.setDepartment(department);
+        ticket.setAuthor("username");
 
         when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(department));
 
@@ -104,8 +105,8 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(roles = "STAFF")
-    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleStaffAndDifferentDepartment() {
+    @WithMockUser(username = "username", roles = "STAFF")
+    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleStaffAndDifferentDepartmentAndAuthor() {
         Department userDepartment = new Department();
         userDepartment.setName("userDepartment");
         when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(userDepartment));
@@ -114,6 +115,7 @@ public class TicketPermissionEvaluatorTest {
         ticketDepartment.setName("ticketDepartment");
         Ticket ticket = new Ticket();
         ticket.setDepartment(ticketDepartment);
+        ticket.setAuthor("differentUsername");
 
         boolean hasPermission = ticketPermissionEvaluator
                 .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "read");
@@ -153,6 +155,33 @@ public class TicketPermissionEvaluatorTest {
         assertThrows(UnsupportedOperationException.class,
                 () -> ticketPermissionEvaluator.hasPermission(SecurityContextHolder.getContext().getAuthentication(),
                         ticket, "nonExistentPermission"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsNotAuthr() {
+        Ticket ticket = new Ticket();
+
+        boolean hasPermission = ticketPermissionEvaluator
+                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "edit");
+
+        assertThat(hasPermission).isFalse();
+    }
+
+    @Test
+    @WithMockUser(roles = "STAFF")
+    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsNotAukthr() {
+        Department userDepartment = new Department();
+        userDepartment.setName("userDepartment");
+        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(userDepartment));
+       
+        Ticket ticket = new Ticket();
+        ticket.setDepartment(userDepartment);
+
+        boolean hasPermission = ticketPermissionEvaluator
+                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "edit");
+
+        assertThat(hasPermission).isTrue();
     }
 
 }

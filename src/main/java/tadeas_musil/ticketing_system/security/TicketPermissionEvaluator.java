@@ -19,35 +19,54 @@ public class TicketPermissionEvaluator implements PermissionEvaluator {
 
     private final DepartmentService departmentService;
 
+    private Authentication authentication;
+
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        if ((authentication == null) || !(targetDomainObject instanceof Ticket) || !(permission instanceof String)){
+        if ((authentication == null) || !(targetDomainObject instanceof Ticket) || !(permission instanceof String)) {
             return false;
         }
+        this.authentication = authentication;
         Ticket ticket = (Ticket) targetDomainObject;
-        if (permission.equals("read")) {
-            if (userHasRole("ADMIN", authentication)) {
-                return true;
-            } 
-            else if (userHasRole("STAFF", authentication)) {
-                List<Department> departments = departmentService.getDepartmentsByUsername(authentication.getName());
-                return departments.contains(ticket.getDepartment());
-            } 
-            else if (userHasRole("USER", authentication)) {
-                return ticket.getAuthor().equals(authentication.getName());
-            }
+        if (userHasRole("ADMIN")) {
+            return true;
         }
-        throw new UnsupportedOperationException("hasPermission not supported");
+        if (userHasRole("STAFF")) {
+            
+            if (permission.equals("edit")) {
+                return isUserInSameDepartmentAs(ticket);
+            }
+            else if(permission.equals("read")){
+                return isUserAuthorOf(ticket) || isUserInSameDepartmentAs(ticket);
+            }
+        } 
+        else if (userHasRole("USER")) {
+            if (permission.equals("read")) {
+                return isUserAuthorOf(ticket);
+            } 
+            else if (permission.equals("edit")) {
+                return false;
+            } 
+        }
+        throw new UnsupportedOperationException("Unsupported hasPermission");
     }
 
-    private boolean userHasRole(String role, Authentication authentication) {
+    private boolean userHasRole(String role) {
         return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_" + role));
+    }
+
+    private boolean isUserAuthorOf(Ticket ticket){
+        return ticket.getAuthor().equals(authentication.getName());
+    }
+    private boolean isUserInSameDepartmentAs(Ticket ticket){
+        List<Department> departments = departmentService.getDepartmentsByUsername(authentication.getName());
+        return departments.contains(ticket.getDepartment());
     }
 
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
             Object permission) {
-        throw new UnsupportedOperationException("hasPermission not supported");
+        throw new UnsupportedOperationException("Unsupported hasPermission");
     }
 
 }
