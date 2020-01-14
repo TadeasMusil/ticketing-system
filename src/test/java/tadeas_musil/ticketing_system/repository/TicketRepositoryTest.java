@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
+import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @DataJpaTest
 public class TicketRepositoryTest {
@@ -32,6 +33,20 @@ public class TicketRepositoryTest {
       assertThat(result.getEvents()).hasSize(1)
                                     .first()
                                     .hasFieldOrPropertyWithValue("content", "eventContent");
+
+    }
+
+    @Test
+    public void setPriority_shouldSetPriorityToHIGH() {
+        Ticket ticket = new Ticket();
+        ticket.setPriority(Priority.LOW);
+        ticketRepository.save(ticket);
+
+        ticketRepository.setPriority(Long.valueOf(1), Priority.HIGH);
+        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
+
+      assertThat(updatedTicket.getPriority()).isEqualTo(Priority.HIGH);
+      
 
     }
 

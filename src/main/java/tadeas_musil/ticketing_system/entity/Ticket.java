@@ -7,20 +7,23 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
-import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Getter;
 import lombok.Setter;
+import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @Getter
 @Setter
@@ -28,7 +31,7 @@ import lombok.Setter;
 public class Ticket {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @NotBlank 
@@ -39,16 +42,16 @@ public class Ticket {
 
     private boolean isClosed;
 
-    @Column(columnDefinition = "CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH'))")
-    private String priority;
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
 
     @ManyToOne
-    @JoinColumn(name = "department")
+    @JoinColumn(name = "department_name")
     private Department department;
 
     @Valid
     @ManyToOne
-    @JoinColumn(name = "ticket_category_id")
+    @JoinColumn(name = "ticket_category_name")
     private TicketCategory category; 
     
     @NotBlank
@@ -57,7 +60,7 @@ public class Ticket {
     private String owner;
 
     @CreationTimestamp
-    private LocalDateTime date;
+    private LocalDateTime created;
     
     @Valid
     @OneToMany( cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,

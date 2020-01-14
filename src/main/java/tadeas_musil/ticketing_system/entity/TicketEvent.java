@@ -36,6 +36,6 @@ public class TicketEvent {
     private String content;
 
     @CreationTimestamp
-    private LocalDateTime date;
+    private LocalDateTime created;
 
 }

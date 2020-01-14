@@ -3,14 +3,22 @@ package tadeas_musil.ticketing_system.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import tadeas_musil.ticketing_system.entity.Ticket;
+import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
   
   @Query("SELECT t FROM Ticket t LEFT JOIN FETCH t.events WHERE t.id = ?1")
   Optional<Ticket> findByIdAndFetchEvents(Long id);
+
+  @Transactional
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query("UPDATE Ticket t SET t.priority = ?2 WHERE t.id = ?1")
+	void setPriority(Long ticketId, Priority priority);
 }

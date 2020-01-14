@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.User;
+import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @Service()
 public interface TicketService {
@@ -15,5 +16,7 @@ public interface TicketService {
     void sendTicketAccessEmail(Long ticketId, String email) throws MessagingException;
 
     Ticket getById(Long id);
+
+    void updatePriority(Long ticketId, Priority priority);
 
 }

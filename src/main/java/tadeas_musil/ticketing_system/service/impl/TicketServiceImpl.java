@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Ticket;
+import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.entity.TicketToken;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
@@ -23,26 +24,21 @@ import tadeas_musil.ticketing_system.service.TicketTokenService;
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
-    
     private final UserRepository userRepository;
-    
-    
+
     private final TicketRepository ticketRepository;
 
-    
     private final EmailService emailService;
 
-    
     private final TicketTokenService ticketTokenService;
 
     @Value("${ticket.access_email.subject}")
     private String accessEmailSubject;
 
-    
-    
     /**
-     Creates a new token for the given ticket and sends a temporary link to author's email
-    */
+     * Creates a new token for the given ticket and sends a temporary link to
+     * author's email
+     */
     public void sendTicketAccessEmail(Long ticketId, String email) throws MessagingException {
         TicketToken token = ticketTokenService.createToken(ticketId);
         Map<String, Object> templateVariables = new HashMap<>();
@@ -60,8 +56,26 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public Ticket getById(Long id) {
         return ticketRepository.findByIdAndFetchEvents(id)
-        .orElseThrow(() -> new NoSuchElementException("Ticket with ID: " + id + " doesn't exist"));
+                .orElseThrow(() -> new NoSuchElementException("Ticket with ID: " + id + " doesn't exist"));
     }
-    
-    
+
+    @Override
+    public void updatePriority(Long ticketId, Priority priority) {
+        if (isValid(priority)) {
+            ticketRepository.setPriority(ticketId, priority);
+        } 
+        else {
+            throw new IllegalArgumentException("Invalid priority: " + priority.name());
+        }
+    }
+
+    private boolean isValid(Priority priority) {
+        for (Priority p : Priority.values()) {
+            if (p.equals(priority)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

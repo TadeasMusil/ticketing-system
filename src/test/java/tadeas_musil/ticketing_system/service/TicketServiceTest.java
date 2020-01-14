@@ -14,12 +14,15 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketToken;
+import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
 import tadeas_musil.ticketing_system.service.impl.TicketServiceImpl;
@@ -67,7 +70,6 @@ public class TicketServiceTest {
     assertThrows(NoSuchElementException.class, () -> ticketService.getById(Long.valueOf(1)));
   }
 
-  
   @Test
   public void getById_shouldReturnCorrectTicket_givenExistingTicket() throws Exception {
     Ticket ticket = new Ticket();
@@ -79,4 +81,11 @@ public class TicketServiceTest {
     assertEquals("author@email.com", result.getAuthor());
   }
 
+  @ParameterizedTest
+  @EnumSource(Priority.class)
+  public void updatePriority_shouldUpdatePriority_givenValidPriority(Priority priority) throws Exception {
+    ticketService.updatePriority(Long.valueOf(5), priority);
+
+    verify(ticketRepository).setPriority(Long.valueOf(5), priority);
+  }
 }

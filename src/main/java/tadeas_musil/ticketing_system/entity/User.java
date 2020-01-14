@@ -45,7 +45,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-@NotNull
+
     @NotBlank(message = "Enter email", groups = { Registration.class })
     @Email(message = "Invalid email format", groups = { Registration.class })
     @UniqueUsername(groups = { Registration.class })

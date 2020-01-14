@@ -1,39 +1,36 @@
 package tadeas_musil.ticketing_system.controller;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import tadeas_musil.exception.InvalidTicketTokenException;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketCategory;
-import tadeas_musil.ticketing_system.entity.User;
+import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.service.DepartmentService;
 import tadeas_musil.ticketing_system.service.TicketCategoryService;
@@ -43,7 +40,7 @@ import tadeas_musil.ticketing_system.validation.TicketAccessForm;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class TicketControllerTest {
+public class TicketControllerTest { 
     
     @Autowired
     private MockMvc mockMvc;
@@ -70,7 +67,7 @@ public class TicketControllerTest {
         form.setTicketId(Long.valueOf(5));  
         when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
-        mockMvc.perform(post("/ticket/processTicketAccessForm")
+        mockMvc.perform(post("/ticket/accessForm")
                     .flashAttr("ticketAccessForm", form)
                     .with(csrf()))
             .andExpect(status().isOk())
@@ -90,7 +87,7 @@ public class TicketControllerTest {
         when(ticketRepository.existsById(anyLong())).thenReturn(true);
         when(ticketRepository.findById(anyLong())).thenReturn(Optional.of(ticket));
        
-       mockMvc.perform(post("/ticket/processTicketAccessForm")
+       mockMvc.perform(post("/ticket/accessForm")
                         .flashAttr("ticketAccessForm", form)
                         .with(csrf()))
            .andExpect(status().is3xxRedirection())
@@ -100,6 +97,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void showCreateTicketForm_shouldReturnCorrectView() throws Exception{
         TicketCategory category = new TicketCategory();
         category.setName("categoryName");
@@ -116,6 +114,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void creatingTicket_shouldCreateTicket_givenValidTicket() throws Exception{
         TicketCategory category = new TicketCategory();
         category.setName("categoryName");
@@ -139,6 +138,7 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void creatingTicket_shouldShowError_givenInvalidTicket() throws Exception{
         mockMvc.perform(post("/ticket")
                 .flashAttr("ticket", new Ticket())
@@ -149,8 +149,21 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void checkTicketStatus_shouldShowTicket_givenValidToken() throws Exception{
         when(ticketTokenService.validateToken(Long.valueOf(1), "uuidToken")).thenReturn(true);
+        Ticket ticket = new Ticket();
+        ticket.setId(Long.valueOf(1));
+        
+        Department department = new Department();
+        department.setName("departmentName");
+        ticket.setDepartment(department);
+        
+        TicketCategory category = new TicketCategory();
+        category.setName("categoryName");
+        ticket.setCategory(category);
+        
+        when(ticketService.getById(anyLong())).thenReturn(ticket);
         
         mockMvc.perform(get("/ticket/1")
                 .param("token", "uuidToken"))
@@ -160,14 +173,16 @@ public class TicketControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void checkTicketStatus_shouldShowError_givenInvalidToken() throws Exception{
         when(ticketTokenService.validateToken(anyLong(), anyString())).thenReturn(false);
+
         
-        mockMvc.perform(get("/ticket/1")
-                .param("token", "uuidToken"))
-           .andExpect(status().isBadRequest())
-           .andExpect(model().attributeExists("errorMessage"))
-           .andExpect(view().name("error"));
+        assertThatThrownBy(() -> mockMvc.perform(get("/ticket/1")
+        .param("token", "uuidToken"))).hasCauseExactlyInstanceOf(InvalidTicketTokenException.class);
+        
+        
+           
     }
 
     @Test
@@ -183,10 +198,32 @@ public class TicketControllerTest {
 
     @Test
     @WithAnonymousUser
-    public void showTicket_shouldReturnForbidden_givenUserDoesNotHavePermission() throws Exception{
+    public void showTicket_shouldGetRedirected_givenUserDoesNotHavePermission() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         
         mockMvc.perform(get("/ticket/1"))
-           .andExpect(status().isForbidden());
+           .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void updatePriority_shouldUpdatePriority_givenUserDoesHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        
+        mockMvc.perform(patch("/ticket/1")
+                        .param("priority", Priority.LOW.toString())
+                        .with(csrf()))
+                .andExpect(status().isOk());
+        verify(ticketService).updatePriority(Long.valueOf(1), Priority.LOW);
+    }
+
+    @Test
+    public void updatePriority_shouldGetRedirected_givenUserDoesNotHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        
+        mockMvc.perform(patch("/ticket/1")
+                        .param("priority", Priority.LOW.toString())
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection());
     }
 }
