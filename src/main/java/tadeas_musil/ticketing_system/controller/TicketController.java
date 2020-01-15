@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import tadeas_musil.exception.InvalidTicketTokenException;
+import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
@@ -107,17 +108,24 @@ public class TicketController {
         return "ticket";
     }
 
-    @PatchMapping(value = "/{ticketId}", params = "priority")
+    @PatchMapping(value = "/{ticketId}/priority", params = "priority")
     @ResponseBody
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
     public void updatePriority(@PathVariable Long ticketId, @RequestParam Priority priority){
         ticketService.updatePriority(ticketId, priority);
     }
 
-    @PatchMapping(value = "/{ticketId}")
+    @PatchMapping(value = "/{ticketId}/category")
     @ResponseBody
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
     public void updatePriority(@PathVariable Long ticketId, @RequestBody TicketCategory category){
         ticketService.updateCategory(ticketId, category);
+    }
+
+    @PatchMapping(value = "/{ticketId}/department")
+    @ResponseBody
+    @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
+    public void updateDepartment(@PathVariable Long ticketId, @RequestBody Department department){
+        ticketService.updateDepartment(ticketId, department);
     }
 }

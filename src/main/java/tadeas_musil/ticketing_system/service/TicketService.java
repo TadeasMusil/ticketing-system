@@ -4,6 +4,7 @@ import javax.mail.MessagingException;
 
 import org.springframework.stereotype.Service;
 
+import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.User;
@@ -21,5 +22,7 @@ public interface TicketService {
     void updatePriority(Long ticketId, Priority priority);
 
     void updateCategory(Long ticketId, TicketCategory category);
+
+    void updateDepartment(Long ticketId, Department department);
 
 }

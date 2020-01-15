@@ -216,7 +216,7 @@ public class TicketControllerTest {
     public void updatePriority_shouldUpdatePriority_givenUserDoesHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         
-        mockMvc.perform(patch("/ticket/1")
+        mockMvc.perform(patch("/ticket/1/priority")
                         .param("priority", Priority.LOW.toString())
                         .with(csrf()))
                 .andExpect(status().isOk());
@@ -227,7 +227,7 @@ public class TicketControllerTest {
     public void updatePriority_shouldGetRedirected_givenUserDoesNotHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         
-        mockMvc.perform(patch("/ticket/1")
+        mockMvc.perform(patch("/ticket/1/priority")
                         .param("priority", Priority.LOW.name())
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection());
@@ -235,14 +235,14 @@ public class TicketControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void updatePriority_shouldUpdateCategory_givenUserDoesHavePermissison() throws Exception{
+    public void updateCategory_shouldUpdateCategory_givenUserDoesHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         TicketCategory category = new TicketCategory();
         category.setName("categoryName");
  
         String jsonCategory = new ObjectMapper().writeValueAsString(category);
 
-        mockMvc.perform(patch("/ticket/1")  
+        mockMvc.perform(patch("/ticket/1/category")  
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonCategory)
                         .with(csrf()))
@@ -259,9 +259,42 @@ public class TicketControllerTest {
 
         String jsonCategory = new ObjectMapper().writeValueAsString(category);
         
-        mockMvc.perform(patch("/ticket/1")
+        mockMvc.perform(patch("/ticket/1/category")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonCategory)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void updateDepartment_shouldUpdateDepartment_givenUserDoesHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        Department department = new Department();
+        department.setName("departmentName");
+    
+        String jsonDepartment = new ObjectMapper().writeValueAsString(department);
+
+        mockMvc.perform(patch("/ticket/1/department")  
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonDepartment)
+                        .with(csrf()))
+                .andExpect(status().isOk());
+        
+                verify(ticketService).updateDepartment(anyLong(), any());
+    }
+
+    @Test
+    public void updateDepartment_shouldGetRedirected_givenUserDoesNotHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        Department department = new Department();
+    department.setName("departmentName");
+
+        String jsonDepartment = new ObjectMapper().writeValueAsString(department);
+        
+        mockMvc.perform(patch("/ticket/1/department")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonDepartment)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection());
     }

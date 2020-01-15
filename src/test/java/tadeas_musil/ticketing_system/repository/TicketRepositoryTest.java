@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
@@ -19,6 +20,9 @@ public class TicketRepositoryTest {
 
     @Autowired
     private TicketCategoryRepository ticketCategoryRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
     @Test
     public void findByName_shouldFindRole_givenExistingRole() {
@@ -70,6 +74,26 @@ public class TicketRepositoryTest {
         Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
 
       assertThat(updatedTicket.getCategory().getName()).isEqualTo(newCategory.getName());
+    }
+
+    @Test
+    public void setDepartment_shouldSetDepartmentToNewDepartment() {
+        Department department = new Department();
+        department.setName("departmentName");
+        departmentRepository.save(department);
+        
+        Ticket ticket = new Ticket();
+        ticket.setDepartment(department);
+        ticketRepository.save(ticket);
+
+        Department newDeparment = new Department();
+        newDeparment.setName("newDepartmentName");
+        departmentRepository.save(newDeparment);
+
+        ticketRepository.setDepartment(Long.valueOf(1), newDeparment);
+        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
+
+        assertThat(updatedTicket.getDepartment().getName()).isEqualTo(newDeparment.getName());
     }
 
 }

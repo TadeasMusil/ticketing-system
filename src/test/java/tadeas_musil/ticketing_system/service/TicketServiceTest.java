@@ -20,10 +20,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.TicketToken;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
+import tadeas_musil.ticketing_system.repository.DepartmentRepository;
 import tadeas_musil.ticketing_system.repository.TicketCategoryRepository;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
@@ -39,19 +41,20 @@ public class TicketServiceTest {
   private TicketTokenService ticketTokenService;
 
   @Mock
-  private UserRepository userRepository;
-
-  @Mock
   private TicketRepository ticketRepository;
 
   @Mock
   private TicketCategoryRepository ticketCategoryRepository;
 
+  @Mock
+  private DepartmentRepository departmentRepository;
+
   private TicketServiceImpl ticketService;
 
   @BeforeEach
   private void setUp() {
-    ticketService = new TicketServiceImpl(userRepository, ticketRepository, ticketCategoryRepository, emailService, ticketTokenService);
+    ticketService = new TicketServiceImpl(ticketRepository, ticketCategoryRepository, 
+        departmentRepository, emailService, ticketTokenService);
   }
 
   @Test
@@ -89,6 +92,8 @@ public class TicketServiceTest {
   @ParameterizedTest
   @EnumSource(Priority.class)
   public void updatePriority_shouldUpdatePriority_givenValidPriority(Priority priority) throws Exception {
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+
     ticketService.updatePriority(Long.valueOf(5), priority);
 
     verify(ticketRepository).setPriority(Long.valueOf(5), priority);
@@ -133,5 +138,40 @@ public class TicketServiceTest {
     when(ticketCategoryRepository.existsById(anyString())).thenReturn(false);
 
     assertThrows(IllegalArgumentException.class, () -> ticketService.updateCategory(Long.valueOf(5), newCategory));
+  }
+
+  @Test
+  public void updateDepartment_shouldUpdateDepartment_givenValidParameters() throws Exception {
+      Department newDepartment = new Department();
+      newDepartment.setName("departmentName");
+
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    when(departmentRepository.existsById(anyString())).thenReturn(true);
+
+    ticketService.updateDepartment(Long.valueOf(5),  newDepartment);
+
+    verify(ticketRepository).setDepartment(Long.valueOf(5), newDepartment);
+  }
+
+  @Test
+  public void updateDepartment_shouldThrowException_givenNonExistentTicket() throws Exception {
+    Department newDepartment = new Department();
+    newDepartment.setName("departmentName");
+
+    when(ticketRepository.existsById(anyLong())).thenReturn(false);
+  
+    
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateDepartment(Long.valueOf(5), newDepartment));
+  }
+
+  @Test
+  public void updateDepartment_shouldThrowException_givenNonExistentDepartment() throws Exception {
+    Department newDepartment = new Department();
+    newDepartment.setName("departmentName");
+
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    when(departmentRepository.existsById(anyString())).thenReturn(false);
+
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateDepartment(Long.valueOf(5), newDepartment));
   }
 }
