@@ -235,7 +235,7 @@ public class TicketControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void updatePriority_shouldUpdatePriority_givenqweUserDoesHavePermissison() throws Exception{
+    public void updatePriority_shouldUpdateCategory_givenUserDoesHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         TicketCategory category = new TicketCategory();
         category.setName("categoryName");
@@ -252,7 +252,7 @@ public class TicketControllerTest {
     }
 
     @Test
-    public void updatePriority_shouldGetRedirected_giveasdUserDoesNotHavePermissison() throws Exception{
+    public void updateCategory_shouldGetRedirected_givenUserDoesNotHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         TicketCategory category = new TicketCategory();
         category.setName("categoryName");
