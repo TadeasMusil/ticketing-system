@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -111,5 +112,12 @@ public class TicketController {
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
     public void updatePriority(@PathVariable Long ticketId, @RequestParam Priority priority){
         ticketService.updatePriority(ticketId, priority);
+    }
+
+    @PatchMapping(value = "/{ticketId}")
+    @ResponseBody
+    @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
+    public void updatePriority(@PathVariable Long ticketId, @RequestBody TicketCategory category){
+        ticketService.updateCategory(ticketId, category);
     }
 }

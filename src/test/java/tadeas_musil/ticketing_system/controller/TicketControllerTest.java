@@ -1,6 +1,7 @@
 package tadeas_musil.ticketing_system.controller;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -13,15 +14,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -222,7 +228,40 @@ public class TicketControllerTest {
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         
         mockMvc.perform(patch("/ticket/1")
-                        .param("priority", Priority.LOW.toString())
+                        .param("priority", Priority.LOW.name())
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void updatePriority_shouldUpdatePriority_givenqweUserDoesHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        TicketCategory category = new TicketCategory();
+        category.setName("categoryName");
+ 
+        String jsonCategory = new ObjectMapper().writeValueAsString(category);
+
+        mockMvc.perform(patch("/ticket/1")  
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonCategory)
+                        .with(csrf()))
+                .andExpect(status().isOk());
+        
+                verify(ticketService).updateCategory(anyLong(), any());
+    }
+
+    @Test
+    public void updatePriority_shouldGetRedirected_giveasdUserDoesNotHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        TicketCategory category = new TicketCategory();
+        category.setName("categoryName");
+
+        String jsonCategory = new ObjectMapper().writeValueAsString(category);
+        
+        mockMvc.perform(patch("/ticket/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonCategory)
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection());
     }

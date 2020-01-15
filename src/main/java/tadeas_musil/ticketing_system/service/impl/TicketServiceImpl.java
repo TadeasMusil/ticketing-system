@@ -12,21 +12,25 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Ticket;
+import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.entity.TicketToken;
+import tadeas_musil.ticketing_system.repository.TicketCategoryRepository;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
 import tadeas_musil.ticketing_system.service.EmailService;
 import tadeas_musil.ticketing_system.service.TicketService;
 import tadeas_musil.ticketing_system.service.TicketTokenService;
 
-@Service()
+@Service
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
 
     private final UserRepository userRepository;
 
     private final TicketRepository ticketRepository;
+
+    private final TicketCategoryRepository ticketCategoryRepository;
 
     private final EmailService emailService;
 
@@ -61,14 +65,17 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public void updatePriority(Long ticketId, Priority priority) {
-        if (isValid(priority)) {
-            ticketRepository.setPriority(ticketId, priority);
-        } 
-        else {
-            throw new IllegalArgumentException("Invalid priority: " + priority.name());
+         if (ticketRepository.existsById(ticketId)) {
+            if (isValid(priority)) {
+                ticketRepository.setPriority(ticketId, priority);
+            } else {
+                throw new IllegalArgumentException("Invalid priority: " + priority.name());
+            }
+        } else {
+            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
         }
     }
-
+    
     private boolean isValid(Priority priority) {
         for (Priority p : Priority.values()) {
             if (p.equals(priority)) {
@@ -76,6 +83,20 @@ public class TicketServiceImpl implements TicketService {
             }
         }
         return false;
+    }
+
+    @Override
+    public void updateCategory(Long ticketId, TicketCategory category) {
+        if (ticketRepository.existsById(ticketId)) {
+            if (ticketCategoryRepository.existsById(category.getName())) {
+                ticketRepository.setCategory(ticketId, category);
+            } else {
+                throw new IllegalArgumentException("Invalid category: " + category.getName());
+            }
+
+        } else {
+            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
+        }
     }
 
 }

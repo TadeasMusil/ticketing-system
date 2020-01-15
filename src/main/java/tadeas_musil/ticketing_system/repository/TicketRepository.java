@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import tadeas_musil.ticketing_system.entity.Ticket;
+import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @Repository
@@ -20,5 +21,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   @Transactional
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("UPDATE Ticket t SET t.priority = ?2 WHERE t.id = ?1")
-	void setPriority(Long ticketId, Priority priority);
+  void setPriority(Long ticketId, Priority priority);
+  
+  @Transactional
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query("UPDATE Ticket t SET t.category = ?2 WHERE t.id = ?1")
+	void setCategory(Long ticketId, TicketCategory category);
 }
