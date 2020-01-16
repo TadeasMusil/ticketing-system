@@ -130,23 +130,31 @@ public class TicketServiceImpl implements TicketService {
     public void updateOwner(Long ticketId, String username) {
         if (ticketRepository.existsById(ticketId)) {
             User newOwner = userRepository.findByUsername(username)
-                                            .orElseThrow(() -> new UsernameNotFoundException(username));
-            
-            if (anyRoleMatch(newOwner.getRoles(), "ADMIN")){
+                    .orElseThrow(() -> new UsernameNotFoundException(username));
+
+            if (anyRoleMatch(newOwner.getRoles(), "ADMIN")) {
                 ticketRepository.setOwner(ticketId, username);
             } else {
                 throw new IllegalArgumentException("Can not assign ticket to " + newOwner);
             }
-            
+
         } else {
             throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
-        } 
+        }
     }
 
-    private boolean anyRoleMatch(Set<Role> roles, String... stringRoles){
+    private boolean anyRoleMatch(Set<Role> roles, String... stringRoles) {
         return roles.stream()
-                    .map(r -> r.getName())
-                    .anyMatch(Set.of(stringRoles)::contains);           
+        .map(r -> r.getName())
+        .anyMatch(Set.of(stringRoles)::contains);
     }
 
+    @Override
+    public void updateStatus(Long ticketId, boolean isClosed) {
+        if (ticketRepository.existsById(ticketId)) {
+            ticketRepository.setIsClosed(ticketId, isClosed);
+        } else {
+            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
+        }
+    }
 }

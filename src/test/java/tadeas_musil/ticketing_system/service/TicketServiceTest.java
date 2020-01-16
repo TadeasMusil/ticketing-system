@@ -226,4 +226,20 @@ public class TicketServiceTest {
     
     verify(ticketRepository).setOwner(Long.valueOf(5), "newOwner@email.com");
   }
+
+  @Test
+  public void updateStatus_shouldUpdateStatus_givenExistingTicket() throws Exception {
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+
+    ticketService.updateStatus(Long.valueOf(5), true);
+    
+    verify(ticketRepository).setIsClosed(Long.valueOf(5), true);
+  }
+
+  @Test
+  public void updateStatus_shouldThrowException_givenNonExistingTicket() throws Exception {
+    when(ticketRepository.existsById(anyLong())).thenReturn(false);
+    
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateStatus(Long.valueOf(5), true));
+  }
 }

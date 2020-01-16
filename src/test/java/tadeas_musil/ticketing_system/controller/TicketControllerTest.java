@@ -329,4 +329,35 @@ public class TicketControllerTest {
 
         verify(ticketService).updateOwner(Long.valueOf(1), owner);
     }
+
+    @Test
+    public void updateStatus_shouldGetRedirected_givenUserDoesNotHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        boolean isClosed = true;
+
+        String jsonIsClosed = new ObjectMapper().writeValueAsString(isClosed);
+        
+        mockMvc.perform(patch("/ticket/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonIsClosed)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void updateStatus_shouldUpdateStatus_givenUserDoesHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        boolean isClosed = true;
+
+        String jsonOwner = new ObjectMapper().writeValueAsString(isClosed);
+        
+        mockMvc.perform(patch("/ticket/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonOwner)
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(ticketService).updateStatus(Long.valueOf(1), isClosed);
+    }
 }

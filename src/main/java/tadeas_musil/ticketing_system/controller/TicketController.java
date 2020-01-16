@@ -137,4 +137,11 @@ public class TicketController {
     public void updateOwner(@PathVariable Long ticketId, @RequestBody TextNode owner){
         ticketService.updateOwner(ticketId, owner.asText());
     }
+
+    @PatchMapping(value = "/{ticketId}/status")
+    @ResponseBody
+    @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
+    public void updateOwner(@PathVariable Long ticketId, @RequestBody boolean isClosed){
+        ticketService.updateStatus(ticketId, isClosed);
+    }
 }

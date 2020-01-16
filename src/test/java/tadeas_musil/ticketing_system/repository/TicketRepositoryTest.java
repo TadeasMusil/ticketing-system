@@ -108,4 +108,16 @@ public class TicketRepositoryTest {
         assertThat(updatedTicket.getOwner()).isEqualTo("newOwner@email.com");
     }
 
+    @Test
+    public void setIsClosed_shouldSetIsClosedToTrue() {
+        Ticket ticket = new Ticket();
+        ticket.setClosed(false);
+        ticketRepository.save(ticket);
+
+        ticketRepository.setIsClosed(Long.valueOf(1), true);
+        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
+
+        assertThat(updatedTicket.isClosed()).isEqualTo(true);
+    }
+
 }

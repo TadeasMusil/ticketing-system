@@ -27,4 +27,6 @@ public interface TicketService {
 
     void updateOwner(Long ticketId, String owner);
 
+    void updateStatus(Long ticketId, boolean isClosed);
+
 }
