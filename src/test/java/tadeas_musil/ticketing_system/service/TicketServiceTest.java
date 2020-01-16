@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,12 +19,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import tadeas_musil.ticketing_system.entity.Department;
+import tadeas_musil.ticketing_system.entity.Role;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.TicketToken;
+import tadeas_musil.ticketing_system.entity.User;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.repository.DepartmentRepository;
 import tadeas_musil.ticketing_system.repository.TicketCategoryRepository;
@@ -47,6 +51,9 @@ public class TicketServiceTest {
   private TicketCategoryRepository ticketCategoryRepository;
 
   @Mock
+  private UserRepository userRepository;
+
+  @Mock
   private DepartmentRepository departmentRepository;
 
   private TicketServiceImpl ticketService;
@@ -54,7 +61,7 @@ public class TicketServiceTest {
   @BeforeEach
   private void setUp() {
     ticketService = new TicketServiceImpl(ticketRepository, ticketCategoryRepository, 
-        departmentRepository, emailService, ticketTokenService);
+        departmentRepository,userRepository, emailService, ticketTokenService);
   }
 
   @Test
@@ -173,5 +180,50 @@ public class TicketServiceTest {
     when(departmentRepository.existsById(anyString())).thenReturn(false);
 
     assertThrows(IllegalArgumentException.class, () -> ticketService.updateDepartment(Long.valueOf(5), newDepartment));
+  }
+
+  @Test
+  public void updateOwner_shouldThrowException_givenNonExistentTicket() throws Exception {
+    when(ticketRepository.existsById(anyLong())).thenReturn(false);
+  
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+  }
+
+  @Test
+  public void updateOwner_shouldThrowException_givenNonExistentNewOwner() throws Exception {
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+
+    assertThrows(UsernameNotFoundException.class, () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+  }
+
+  @Test
+  public void updateOwner_shouldThrowException_givenNewOwnerDoesNotHaveRightRole() throws Exception {
+    Role wrongRole = new Role();
+    wrongRole.setName("wrongRole");
+    
+    User newOwner = new User();
+    newOwner.setRoles(Set.of(wrongRole));
+    
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(newOwner));
+    
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+  }
+
+  @Test
+  public void updateOwner_shouldUpdateOwner_givenValidParameters() throws Exception {
+    Role adminRole = new Role();
+    adminRole.setName("ADMIN");
+    
+    User newOwner = new User();
+    newOwner.setRoles(Set.of(adminRole));
+    
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(newOwner));
+
+    ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com");
+    
+    verify(ticketRepository).setOwner(Long.valueOf(5), "newOwner@email.com");
   }
 }

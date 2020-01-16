@@ -1,21 +1,29 @@
 package tadeas_musil.ticketing_system.service.impl;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
+import tadeas_musil.ticketing_system.entity.Role;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.entity.TicketToken;
+import tadeas_musil.ticketing_system.entity.User;
 import tadeas_musil.ticketing_system.repository.DepartmentRepository;
 import tadeas_musil.ticketing_system.repository.TicketCategoryRepository;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
@@ -33,6 +41,8 @@ public class TicketServiceImpl implements TicketService {
     private final TicketCategoryRepository ticketCategoryRepository;
 
     private final DepartmentRepository departmentRepository;
+
+    private final UserRepository userRepository;
 
     private final EmailService emailService;
 
@@ -114,6 +124,29 @@ public class TicketServiceImpl implements TicketService {
             throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
         }
 
+    }
+
+    @Override
+    public void updateOwner(Long ticketId, String username) {
+        if (ticketRepository.existsById(ticketId)) {
+            User newOwner = userRepository.findByUsername(username)
+                                            .orElseThrow(() -> new UsernameNotFoundException(username));
+            
+            if (anyRoleMatch(newOwner.getRoles(), "ADMIN")){
+                ticketRepository.setOwner(ticketId, username);
+            } else {
+                throw new IllegalArgumentException("Can not assign ticket to " + newOwner);
+            }
+            
+        } else {
+            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
+        } 
+    }
+
+    private boolean anyRoleMatch(Set<Role> roles, String... stringRoles){
+        return roles.stream()
+                    .map(r -> r.getName())
+                    .anyMatch(Set.of(stringRoles)::contains);           
     }
 
 }

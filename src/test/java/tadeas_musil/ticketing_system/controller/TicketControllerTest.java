@@ -298,4 +298,35 @@ public class TicketControllerTest {
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection());
     }
+
+    @Test
+    public void updateOwner_shouldGetRedirected_givenUserDoesNotHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        String owner = "newOwner@email.com";
+
+        String jsonOwner = new ObjectMapper().writeValueAsString(owner);
+        
+        mockMvc.perform(patch("/ticket/1/owner")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonOwner)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void updateOwner_shouldUpdateOwner_givenUserDoesHavePermissison() throws Exception{
+        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+        String owner = "newOwner@email.com";
+
+        String jsonOwner = new ObjectMapper().writeValueAsString(owner);
+        
+        mockMvc.perform(patch("/ticket/1/owner")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonOwner)
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(ticketService).updateOwner(Long.valueOf(1), owner);
+    }
 }

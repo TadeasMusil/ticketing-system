@@ -5,6 +5,8 @@ import java.util.List;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.databind.node.TextNode;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -127,5 +129,12 @@ public class TicketController {
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
     public void updateDepartment(@PathVariable Long ticketId, @RequestBody Department department){
         ticketService.updateDepartment(ticketId, department);
+    }
+
+    @PatchMapping(value = "/{ticketId}/owner")
+    @ResponseBody
+    @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
+    public void updateOwner(@PathVariable Long ticketId, @RequestBody TextNode owner){
+        ticketService.updateOwner(ticketId, owner.asText());
     }
 }

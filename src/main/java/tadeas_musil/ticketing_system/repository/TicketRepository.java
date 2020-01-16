@@ -32,5 +32,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   @Transactional
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("UPDATE Ticket t SET t.department = ?2 WHERE t.id = ?1")
-	void setDepartment(Long ticketId, Department category);
+  void setDepartment(Long ticketId, Department category);
+  
+  @Transactional
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query("UPDATE Ticket t SET t.owner = ?2 WHERE t.id = ?1")
+  void setOwner(Long ticketId, String owner);
 }

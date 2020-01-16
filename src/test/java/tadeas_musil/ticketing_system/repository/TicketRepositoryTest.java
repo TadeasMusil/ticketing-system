@@ -96,4 +96,16 @@ public class TicketRepositoryTest {
         assertThat(updatedTicket.getDepartment().getName()).isEqualTo(newDeparment.getName());
     }
 
+    @Test
+    public void setOwner_shouldSetOwnerToNewOwner() {
+        Ticket ticket = new Ticket();
+        ticket.setOwner("owner@email.com");
+        ticketRepository.save(ticket);
+
+        ticketRepository.setOwner(Long.valueOf(1), "newOwner@email.com");
+        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
+
+        assertThat(updatedTicket.getOwner()).isEqualTo("newOwner@email.com");
+    }
+
 }

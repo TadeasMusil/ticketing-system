@@ -25,4 +25,6 @@ public interface TicketService {
 
     void updateDepartment(Long ticketId, Department department);
 
+    void updateOwner(Long ticketId, String owner);
+
 }
