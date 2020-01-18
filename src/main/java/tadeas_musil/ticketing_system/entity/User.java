@@ -18,7 +18,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -43,7 +42,8 @@ public class User {
     public interface Registration {};
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  //  @SequenceGenerator(name = "userseq", sequenceName = "user_seq")
     private Long id;
 
     @NotBlank(message = "Enter email", groups = { Registration.class })
@@ -66,7 +66,7 @@ public class User {
                     
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "app_user_role",
-                joinColumns = @JoinColumn(name = "app_user_id"),
+                joinColumns = @JoinColumn(name = "user_id"),
                 inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
