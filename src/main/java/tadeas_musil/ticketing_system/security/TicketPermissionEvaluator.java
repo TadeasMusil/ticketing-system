@@ -52,7 +52,7 @@ public class TicketPermissionEvaluator implements PermissionEvaluator {
     }
 
     private boolean userHasRole(String role) {
-        return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_" + role));
+        return authentication.getAuthorities().contains(new SimpleGrantedAuthority(role));
     }
 
     private boolean isUserAuthorOf(Ticket ticket){

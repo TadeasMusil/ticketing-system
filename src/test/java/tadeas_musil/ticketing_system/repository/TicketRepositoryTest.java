@@ -5,21 +5,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
-import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @DataJpaTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TicketRepositoryTest {
 
     @Autowired
     private TicketRepository ticketRepository;
-
-    @Autowired
-    private TicketCategoryRepository ticketCategoryRepository;
 
     @Autowired
     private DepartmentRepository departmentRepository;
@@ -33,7 +31,9 @@ public class TicketRepositoryTest {
         event.setContent("eventContent");
 
         ticket.addEvent(event);
-        ticketRepository.save(ticket);
+        ticket = ticketRepository.save(ticket);
+        
+        Ticket t = ticketRepository.save(new Ticket());
        
       Ticket result = ticketRepository.findByIdAndFetchEvents(Long.valueOf(1)).get();
 
@@ -48,7 +48,7 @@ public class TicketRepositoryTest {
     public void setPriority_shouldSetPriorityToHIGH() {
         Ticket ticket = new Ticket();
         ticket.setPriority(Priority.LOW);
-        ticketRepository.save(ticket);
+        ticket = ticketRepository.save(ticket);
 
         ticketRepository.setPriority(Long.valueOf(1), Priority.HIGH);
         Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
@@ -56,44 +56,25 @@ public class TicketRepositoryTest {
       assertThat(updatedTicket.getPriority()).isEqualTo(Priority.HIGH);
     }
 
+    
     @Test
-    public void setCategory_shouldSetCategoryToNewCategory() {
-        TicketCategory category = new TicketCategory();
-        category.setName("categoryName");
-        ticketCategoryRepository.save(category);
-        
-        Ticket ticket = new Ticket();
-        ticket.setCategory(category);
-        ticketRepository.save(ticket);
-
-        TicketCategory newCategory = new TicketCategory();
-        newCategory.setName("newCategoryName");
-        ticketCategoryRepository.save(newCategory);
-
-        ticketRepository.setCategory(Long.valueOf(1), newCategory);
-        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
-
-      assertThat(updatedTicket.getCategory().getName()).isEqualTo(newCategory.getName());
-    }
-
-    @Test
-    public void setDepartment_shouldSetDepartmentToNewDepartment() {
+    public void setDepartment_shouldSetDepartmentToDifferentDepartment() {
         Department department = new Department();
         department.setName("departmentName");
-        departmentRepository.save(department);
+        department =  departmentRepository.save(department);
         
         Ticket ticket = new Ticket();
         ticket.setDepartment(department);
-        ticketRepository.save(ticket);
+        ticket = ticketRepository.save(ticket);
+ 
+        Department differentDepartment = new Department();
+        differentDepartment.setName("differentDepartmentName");
+        differentDepartment = departmentRepository.save(differentDepartment);
 
-        Department newDeparment = new Department();
-        newDeparment.setName("newDepartmentName");
-        departmentRepository.save(newDeparment);
-
-        ticketRepository.setDepartment(Long.valueOf(1), newDeparment);
+        ticketRepository.setDepartment(Long.valueOf(1), differentDepartment);
         Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
 
-        assertThat(updatedTicket.getDepartment().getName()).isEqualTo(newDeparment.getName());
+        assertThat(updatedTicket.getDepartment().getName()).isEqualTo(differentDepartment.getName());
     }
 
     @Test

@@ -31,7 +31,7 @@ import tadeas_musil.ticketing_system.entity.enums.Priority;
 public class Ticket {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     
     @NotBlank 
@@ -48,11 +48,6 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "department_name")
     private Department department;
-
-    @Valid
-    @ManyToOne
-    @JoinColumn(name = "ticket_category_name")
-    private TicketCategory category; 
     
     @NotBlank
     private String author;
@@ -62,8 +57,8 @@ public class Ticket {
     @CreationTimestamp
     private LocalDateTime created;
     
-    @Valid
-    @OneToMany( cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
+    @Valid 
+    @OneToMany(mappedBy = "ticket", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
             CascadeType.REFRESH })
     private List<TicketEvent> events = new ArrayList<>();
 

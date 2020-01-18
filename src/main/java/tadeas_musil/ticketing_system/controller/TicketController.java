@@ -26,10 +26,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tadeas_musil.exception.InvalidTicketTokenException;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
-import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.service.DepartmentService;
-import tadeas_musil.ticketing_system.service.TicketCategoryService;
 import tadeas_musil.ticketing_system.service.TicketService;
 import tadeas_musil.ticketing_system.service.TicketTokenService;
 import tadeas_musil.ticketing_system.validation.TicketAccessForm;
@@ -40,9 +38,6 @@ public class TicketController {
 
     @Autowired
     private TicketService ticketService;
-
-    @Autowired
-    private TicketCategoryService ticketCategoryService;
 
     @Autowired
     private TicketTokenService ticketTokenService;
@@ -66,8 +61,8 @@ public class TicketController {
     @GetMapping
     public String showTicketForm(Model model) {
         Ticket ticket = new Ticket();
-        List<TicketCategory> categories = ticketCategoryService.getAllCategories();
-        model.addAttribute("categories", categories);
+        List<Department> departments = departmentService.getAllDepartments();
+        model.addAttribute("departments", departments);
         model.addAttribute("ticket", ticket);
         return "create-ticket";
     }
@@ -105,7 +100,6 @@ public class TicketController {
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'read')")
     public String showTicket(@PathVariable Long ticketId, Model model) {
         model.addAttribute("ticket", ticketService.getById(ticketId));
-        model.addAttribute("categories", ticketCategoryService.getAllCategories());
         model.addAttribute("departments", departmentService.getAllDepartments());
         return "ticket";
     }
@@ -115,13 +109,6 @@ public class TicketController {
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
     public void updatePriority(@PathVariable Long ticketId, @RequestParam Priority priority){
         ticketService.updatePriority(ticketId, priority);
-    }
-
-    @PatchMapping(value = "/{ticketId}/category")
-    @ResponseBody
-    @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
-    public void updatePriority(@PathVariable Long ticketId, @RequestBody TicketCategory category){
-        ticketService.updateCategory(ticketId, category);
     }
 
     @PatchMapping(value = "/{ticketId}/department")

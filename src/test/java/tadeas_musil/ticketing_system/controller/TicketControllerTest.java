@@ -35,11 +35,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import tadeas_musil.exception.InvalidTicketTokenException;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
-import tadeas_musil.ticketing_system.entity.TicketCategory;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.service.DepartmentService;
-import tadeas_musil.ticketing_system.service.TicketCategoryService;
 import tadeas_musil.ticketing_system.service.TicketService;
 import tadeas_musil.ticketing_system.service.TicketTokenService;
 import tadeas_musil.ticketing_system.validation.TicketAccessForm;
@@ -53,9 +51,6 @@ public class TicketControllerTest {
 
     @MockBean
     private TicketService ticketService;
-
-    @MockBean
-    private TicketCategoryService ticketCategoryService;
 
     @MockBean
     private TicketRepository ticketRepository;
@@ -105,15 +100,15 @@ public class TicketControllerTest {
     @Test
     @WithMockUser
     public void showCreateTicketForm_shouldReturnCorrectView() throws Exception{
-        TicketCategory category = new TicketCategory();
-        category.setName("categoryName");
-        List<TicketCategory> categories = List.of(category);
+        Department department = new Department();
+        department.setName("departmentName");
+        List<Department> departments = List.of(department);
         
-        when(ticketCategoryService.getAllCategories()).thenReturn(categories);
+        when(departmentService.getAllDepartments()).thenReturn(departments);
        
        mockMvc.perform(get("/ticket"))
            .andExpect(status().isOk())
-           .andExpect(model().attribute("categories", categories))
+           .andExpect(model().attribute("departments", departments))
            .andExpect(model().attributeExists("ticket"))
            .andExpect(view().name("create-ticket"));
            
@@ -122,12 +117,9 @@ public class TicketControllerTest {
     @Test
     @WithMockUser
     public void creatingTicket_shouldCreateTicket_givenValidTicket() throws Exception{
-        TicketCategory category = new TicketCategory();
-        category.setName("categoryName");
         
         Ticket validTicket = new Ticket();
         validTicket.setAuthor("author");
-        validTicket.setCategory(category);
         validTicket.setContent("content");
         validTicket.setSubject("subject");
         
@@ -165,10 +157,6 @@ public class TicketControllerTest {
         department.setName("departmentName");
         ticket.setDepartment(department);
         
-        TicketCategory category = new TicketCategory();
-        category.setName("categoryName");
-        ticket.setCategory(category);
-        
         when(ticketService.getById(anyLong())).thenReturn(ticket);
         
         mockMvc.perform(get("/ticket/1")
@@ -192,13 +180,13 @@ public class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(authorities = "ADMIN")
     public void showTicket_shouldShowTicket_givenUserHasPermission() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         
         mockMvc.perform(get("/ticket/1"))
            .andExpect(status().isOk())
-           .andExpect(model().attributeExists("ticket", "categories", "departments"))
+           .andExpect(model().attributeExists("ticket", "departments"))
            .andExpect(view().name("ticket"));
     }
 
@@ -212,7 +200,7 @@ public class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(authorities = "ADMIN")
     public void updatePriority_shouldUpdatePriority_givenUserDoesHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         
@@ -234,40 +222,7 @@ public class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
-    public void updateCategory_shouldUpdateCategory_givenUserDoesHavePermissison() throws Exception{
-        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
-        TicketCategory category = new TicketCategory();
-        category.setName("categoryName");
- 
-        String jsonCategory = new ObjectMapper().writeValueAsString(category);
-
-        mockMvc.perform(patch("/ticket/1/category")  
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonCategory)
-                        .with(csrf()))
-                .andExpect(status().isOk());
-        
-                verify(ticketService).updateCategory(anyLong(), any());
-    }
-
-    @Test
-    public void updateCategory_shouldGetRedirected_givenUserDoesNotHavePermissison() throws Exception{
-        when(ticketService.getById(anyLong())).thenReturn(new Ticket());
-        TicketCategory category = new TicketCategory();
-        category.setName("categoryName");
-
-        String jsonCategory = new ObjectMapper().writeValueAsString(category);
-        
-        mockMvc.perform(patch("/ticket/1/category")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonCategory)
-                        .with(csrf()))
-                .andExpect(status().is3xxRedirection());
-    }
-
-    @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(authorities = "ADMIN")
     public void updateDepartment_shouldUpdateDepartment_givenUserDoesHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         Department department = new Department();
@@ -314,7 +269,7 @@ public class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(authorities = "ADMIN")
     public void updateOwner_shouldUpdateOwner_givenUserDoesHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         String owner = "newOwner@email.com";
@@ -345,7 +300,7 @@ public class TicketControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(authorities = "ADMIN")
     public void updateStatus_shouldUpdateStatus_givenUserDoesHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         boolean isClosed = true;

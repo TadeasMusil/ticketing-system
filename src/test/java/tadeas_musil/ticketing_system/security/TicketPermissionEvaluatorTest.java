@@ -76,7 +76,7 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(authorities = "ADMIN")
     public void hasPermission_shouldReturnTrue_givenPermissionReadAndRoleAdmin() {
         Ticket ticket = new Ticket();
 
@@ -87,7 +87,7 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(username = "username", roles = "STAFF")
+    @WithMockUser(username = "username", authorities = "STAFF")
     public void hasPermission_shouldReturnTrue_givenPermissionReadAndRoleStaffAndMatchingDepartment() {
         Department department = new Department();
         department.setName("departmentName");
@@ -105,7 +105,7 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(username = "username", roles = "STAFF")
+    @WithMockUser(username = "username", authorities = "STAFF")
     public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleStaffAndDifferentDepartmentAndAuthor() {
         Department userDepartment = new Department();
         userDepartment.setName("userDepartment");
@@ -124,7 +124,7 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(username = "author", roles = "USER")
+    @WithMockUser(username = "author", authorities = "USER")
     public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsAuthor() {
         Ticket ticket = new Ticket();
         ticket.setAuthor("author");
@@ -136,7 +136,7 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(username = "notAuthor", roles = "USER")
+    @WithMockUser(username = "notAuthor", authorities = "USER")
     public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsNotAuthor() {
         Ticket ticket = new Ticket();
         ticket.setAuthor("author");
@@ -158,7 +158,7 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(authorities = "USER")
     public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsNotAuthr() {
         Ticket ticket = new Ticket();
 
@@ -169,7 +169,7 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser(roles = "STAFF")
+    @WithMockUser(authorities = "STAFF")
     public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsNotAukthr() {
         Department userDepartment = new Department();
         userDepartment.setName("userDepartment");
