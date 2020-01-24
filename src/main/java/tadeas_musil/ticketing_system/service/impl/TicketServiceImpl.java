@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Role;
 import tadeas_musil.ticketing_system.entity.Ticket;
+import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.entity.TicketToken;
 import tadeas_musil.ticketing_system.entity.User;
@@ -110,13 +111,13 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void updateOwner(Long ticketId, String username) {
+    public void updateOwner(Long ticketId, String newOwnerUsername) {
         if (ticketRepository.existsById(ticketId)) {
-            User newOwner = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException(username));
+            User newOwner = userRepository.findByUsername(newOwnerUsername)
+                    .orElseThrow(() -> new UsernameNotFoundException(newOwnerUsername));
 
-            if (anyRoleMatch(newOwner.getRoles(), "ADMIN")) {
-                ticketRepository.setOwner(ticketId, username);
+            if (anyRoleMatch(newOwner.getRoles(), "ADMIN", "STAFF")) {
+                ticketRepository.setOwner(ticketId, newOwnerUsername);
             } else {
                 throw new IllegalArgumentException("Can not assign ticket to " + newOwner);
             }

@@ -53,5 +53,4 @@ public class UserServiceTest {
                     .hasFieldOrPropertyWithValue("password", "encryptedPassword");
     assertThat(createdUser.getRoles()).hasSize(1);
   }
-
 }

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -172,13 +173,14 @@ public class TicketServiceTest {
     assertThrows(IllegalArgumentException.class, () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
   }
 
-  @Test
-  public void updateOwner_shouldUpdateOwner_givenValidParameters() throws Exception {
-    Role adminRole = new Role();
-    adminRole.setName("ADMIN");
+  @ParameterizedTest
+  @ValueSource(strings = {"ADMIN", "STAFF"})
+  public void updateOwner_shouldUpdateOwner_givenValidRole(String roleName) throws Exception {
+    Role role = new Role();
+    role.setName(roleName);
     
     User newOwner = new User();
-    newOwner.setRoles(Set.of(adminRole));
+    newOwner.getRoles().add(role);
     
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(newOwner));
@@ -204,3 +206,4 @@ public class TicketServiceTest {
     assertThrows(IllegalArgumentException.class, () -> ticketService.updateStatus(Long.valueOf(5), true));
   }
 }
+
