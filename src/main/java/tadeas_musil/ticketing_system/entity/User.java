@@ -20,7 +20,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.NaturalId;
+
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,18 +40,20 @@ import tadeas_musil.ticketing_system.validation.UniqueUsername;
 @Entity
 @Table(name = "app_user")
 @PasswordMatch(groups = { Registration.class }, first = "password", second = "passwordConfirmation")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
     
     public interface Registration {};
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  //  @SequenceGenerator(name = "userseq", sequenceName = "user_seq")
     private Long id;
 
     @NotBlank(message = "Enter email", groups = { Registration.class })
     @Email(message = "Invalid email format", groups = { Registration.class })
     @UniqueUsername(groups = { Registration.class })
+    @NaturalId
+    @EqualsAndHashCode.Include
     private String username;
 
     @NotBlank(message = "Enter first name", groups = { Registration.class })
@@ -83,7 +88,6 @@ public class User {
                 joinColumns = @JoinColumn(name = "app_user_id"),
                 inverseJoinColumns = @JoinColumn(name = "department_name"))
     private List<Department> departments = new ArrayList<>();
-
 
         
 }

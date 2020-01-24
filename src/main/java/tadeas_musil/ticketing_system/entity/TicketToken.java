@@ -9,12 +9,16 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.NaturalId;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class TicketToken {
 
     @Id
@@ -25,6 +29,8 @@ public class TicketToken {
     @JoinColumn(name = "ticket_id")
     private Ticket ticket;
 
+    @NaturalId
+    @EqualsAndHashCode.Include
     private String token;
 
     private LocalDateTime expiryDate;
