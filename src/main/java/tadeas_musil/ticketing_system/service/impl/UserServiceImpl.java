@@ -1,5 +1,7 @@
 package tadeas_musil.ticketing_system.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,10 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
- 
+
+    @Override
+    public List<User> getAllStaffMembers() {
+        return userRepository.findAllByRoleInAndOrderByUsername("ADMIN", "STAFF");
+    }
 
 }
