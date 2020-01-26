@@ -14,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Getter;
 import lombok.Setter;
+import tadeas_musil.ticketing_system.entity.enums.TicketEventType;
 
 @Entity
 @Getter
@@ -28,7 +29,7 @@ public class TicketEvent {
     @JoinColumn(name = "ticket_id")
     private Ticket ticket;
 
-    private String type;
+    private TicketEventType type;
 
     private String author;
     

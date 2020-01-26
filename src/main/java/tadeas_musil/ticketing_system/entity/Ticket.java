@@ -20,11 +20,13 @@ import javax.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 public class Ticket {
 
@@ -85,6 +87,10 @@ public class Ticket {
         Ticket other = (Ticket) obj;
         return id != null &&
                id.equals(other.getId());
+    }
+
+    public Ticket(Long id) {
+        this.id = id;
     }
 
     
