@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +31,7 @@ import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.service.DepartmentService;
 import tadeas_musil.ticketing_system.service.TicketService;
 import tadeas_musil.ticketing_system.service.TicketTokenService;
+import tadeas_musil.ticketing_system.service.UserService;
 import tadeas_musil.ticketing_system.validation.TicketAccessForm;
 
 @Controller
@@ -44,6 +46,9 @@ public class TicketController {
 
     @Autowired
     private DepartmentService departmentService;
+
+    @Autowired
+    private UserService userService;
 
     // Validates that the given ticketId and email are
     // matching and sends a link to the given email
@@ -92,8 +97,6 @@ public class TicketController {
         else {
             throw new InvalidTicketTokenException();
         }
-
-        
     }
 
     @GetMapping("/{ticketId}")
@@ -101,13 +104,14 @@ public class TicketController {
     public String showTicket(@PathVariable Long ticketId, Model model) {
         model.addAttribute("ticket", ticketService.getById(ticketId));
         model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("staffMembers", userService.getAllStaffMembers());
         return "ticket";
     }
 
-    @PatchMapping(value = "/{ticketId}/priority", params = "priority")
+    @PatchMapping(value = "/{ticketId}/priority")
     @ResponseBody
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
-    public void updatePriority(@PathVariable Long ticketId, @RequestParam Priority priority){
+    public void updatePriority(@PathVariable Long ticketId, @RequestBody Priority priority){
         ticketService.updatePriority(ticketId, priority);
     }
 
@@ -122,13 +126,13 @@ public class TicketController {
     @ResponseBody
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
     public void updateOwner(@PathVariable Long ticketId, @RequestBody TextNode owner){
-        ticketService.updateOwner(ticketId, owner.asText());
+        ticketService.updateOwner(ticketId, owner.textValue());
     }
 
     @PatchMapping(value = "/{ticketId}/status")
     @ResponseBody
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
-    public void updateOwner(@PathVariable Long ticketId, @RequestBody boolean isClosed){
+    public void updateStatus(@PathVariable Long ticketId, @RequestBody boolean isClosed){
         ticketService.updateStatus(ticketId, isClosed);
     }
 }

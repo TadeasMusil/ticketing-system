@@ -29,6 +29,7 @@ import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketToken;
 import tadeas_musil.ticketing_system.entity.User;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
+import tadeas_musil.ticketing_system.entity.enums.TicketEventType;
 import tadeas_musil.ticketing_system.repository.DepartmentRepository;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
@@ -52,12 +53,15 @@ public class TicketServiceTest {
   @Mock
   private DepartmentRepository departmentRepository;
 
+  @Mock
+  private TicketEventService ticketEventService;
+
   private TicketServiceImpl ticketService;
 
   @BeforeEach
   private void setUp() {
-    ticketService = new TicketServiceImpl(ticketRepository, 
-        departmentRepository,userRepository, emailService, ticketTokenService);
+    ticketService = new TicketServiceImpl(ticketRepository, departmentRepository, userRepository, emailService,
+        ticketTokenService, ticketEventService);
   }
 
   @Test
@@ -96,10 +100,13 @@ public class TicketServiceTest {
   @EnumSource(Priority.class)
   public void updatePriority_shouldUpdatePriority_givenValidPriority(Priority priority) throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    Long ticketId = Long.valueOf(1);
 
-    ticketService.updatePriority(Long.valueOf(5), priority);
+    ticketService.updatePriority(ticketId, priority);
 
-    verify(ticketRepository).setPriority(Long.valueOf(5), priority);
+    verify(ticketRepository).setPriority(ticketId, priority);
+    verify(ticketEventService).createEvent(ticketId, TicketEventType.PRIORITY_CHANGE, priority.name());
+
   }
 
   @Test
@@ -111,15 +118,17 @@ public class TicketServiceTest {
 
   @Test
   public void updateDepartment_shouldUpdateDepartment_givenValidParameters() throws Exception {
-      Department newDepartment = new Department();
-      newDepartment.setName("departmentName");
+    Department newDepartment = new Department();
+    newDepartment.setName("departmentName");
+    Long ticketId = Long.valueOf(1);
 
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(departmentRepository.existsById(anyString())).thenReturn(true);
 
-    ticketService.updateDepartment(Long.valueOf(5),  newDepartment);
+    ticketService.updateDepartment(ticketId, newDepartment);
 
-    verify(ticketRepository).setDepartment(Long.valueOf(5), newDepartment);
+    verify(ticketRepository).setDepartment(ticketId, newDepartment);
+    verify(ticketEventService).createEvent(ticketId, TicketEventType.DEPARTMENT_CHANGE, newDepartment.getName());
   }
 
   @Test
@@ -128,8 +137,7 @@ public class TicketServiceTest {
     newDepartment.setName("departmentName");
 
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
-  
-    
+
     assertThrows(IllegalArgumentException.class, () -> ticketService.updateDepartment(Long.valueOf(5), newDepartment));
   }
 
@@ -147,8 +155,9 @@ public class TicketServiceTest {
   @Test
   public void updateOwner_shouldThrowException_givenNonExistentTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
-  
-    assertThrows(IllegalArgumentException.class, () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+
+    assertThrows(IllegalArgumentException.class,
+        () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
   }
 
   @Test
@@ -156,54 +165,72 @@ public class TicketServiceTest {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
-    assertThrows(UsernameNotFoundException.class, () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+    assertThrows(UsernameNotFoundException.class,
+        () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
   }
 
   @Test
   public void updateOwner_shouldThrowException_givenNewOwnerDoesNotHaveRightRole() throws Exception {
     Role wrongRole = new Role();
     wrongRole.setName("wrongRole");
-    
+
     User newOwner = new User();
     newOwner.setRoles(Set.of(wrongRole));
-    
+
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(newOwner));
-    
-    assertThrows(IllegalArgumentException.class, () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+
+    assertThrows(IllegalArgumentException.class,
+        () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"ADMIN", "STAFF"})
+  @ValueSource(strings = { "ADMIN", "STAFF" })
   public void updateOwner_shouldUpdateOwner_givenValidRole(String roleName) throws Exception {
     Role role = new Role();
     role.setName(roleName);
-    
+
     User newOwner = new User();
     newOwner.getRoles().add(role);
-    
+    newOwner.setUsername("newOwner@email.com");
+
+    Long ticketId = Long.valueOf(1);
+
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(newOwner));
 
-    ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com");
-    
-    verify(ticketRepository).setOwner(Long.valueOf(5), "newOwner@email.com");
+    ticketService.updateOwner(ticketId, newOwner.getUsername());
+
+    verify(ticketRepository).setOwner(ticketId, newOwner.getUsername());
+    verify(ticketEventService).createEvent(ticketId, TicketEventType.OWNER_CHANGE, newOwner.getUsername());
   }
 
   @Test
   public void updateStatus_shouldUpdateStatus_givenExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    Long ticketId = Long.valueOf(1);
 
-    ticketService.updateStatus(Long.valueOf(5), true);
-    
-    verify(ticketRepository).setIsClosed(Long.valueOf(5), true);
+    ticketService.updateStatus(ticketId, true);
+
+    verify(ticketRepository).setIsClosed(ticketId, true);
+    verify(ticketEventService).createEvent(ticketId, TicketEventType.STATUS_CHANGE, "CLOSED");
+  }
+
+   @Test
+  public void updateStatus_shouldUpdateStatuss_givenExistingTicket() throws Exception {
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    Long ticketId = Long.valueOf(1);
+
+    ticketService.updateStatus(ticketId, false);
+
+    verify(ticketRepository).setIsClosed(ticketId, false);
+    verify(ticketEventService).createEvent(ticketId, TicketEventType.STATUS_CHANGE, "OPEN");
   }
 
   @Test
   public void updateStatus_shouldThrowException_givenNonExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
-    
+
     assertThrows(IllegalArgumentException.class, () -> ticketService.updateStatus(Long.valueOf(5), true));
   }
 }
-

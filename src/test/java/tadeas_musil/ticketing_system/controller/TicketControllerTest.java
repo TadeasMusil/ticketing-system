@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 import java.util.List;
@@ -203,9 +202,12 @@ public class TicketControllerTest {
     @WithMockUser(authorities = "ADMIN")
     public void updatePriority_shouldUpdatePriority_givenUserDoesHavePermissison() throws Exception{
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
+
+        String jsonPriority = new ObjectMapper().writeValueAsString(Priority.LOW);
         
         mockMvc.perform(patch("/ticket/1/priority")
-                        .param("priority", Priority.LOW.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPriority)
                         .with(csrf()))
                 .andExpect(status().isOk());
         verify(ticketService).updatePriority(Long.valueOf(1), Priority.LOW);
@@ -216,7 +218,6 @@ public class TicketControllerTest {
         when(ticketService.getById(anyLong())).thenReturn(new Ticket());
         
         mockMvc.perform(patch("/ticket/1/priority")
-                        .param("priority", Priority.LOW.name())
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection());
     }
