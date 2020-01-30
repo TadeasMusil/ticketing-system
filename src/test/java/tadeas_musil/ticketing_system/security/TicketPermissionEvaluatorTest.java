@@ -10,9 +10,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -86,9 +87,10 @@ public class TicketPermissionEvaluatorTest {
         assertThat(hasPermission).isTrue();
     }
 
-    @Test
+    @ParameterizedTest
+	@ValueSource(strings = {"read", "respond"})
     @WithMockUser(username = "username", authorities = "STAFF")
-    public void hasPermission_shouldReturnTrue_givenPermissionReadAndRoleStaffAndMatchingDepartment() {
+    public void hasPermission_shouldReturnTrue_givenRoleStaffAndMatchingDepartment(String permission) {
         Department department = new Department();
         department.setName("departmentName");
 
@@ -99,14 +101,15 @@ public class TicketPermissionEvaluatorTest {
         when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(department));
 
         boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "read");
+                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, permission);
 
         assertThat(hasPermission).isTrue();
     }
 
-    @Test
-    @WithMockUser(username = "username", authorities = "STAFF")
-    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleStaffAndDifferentDepartmentAndAuthor() {
+    @ParameterizedTest
+	@ValueSource(strings = {"read", "respond"})
+    @WithMockUser(username = "notAuthor", authorities = "STAFF")
+    public void hasPermission_shouldReturnFalse_givenRoleStaffAndDifferentDepartmentAndAuthor(String permission) {
         Department userDepartment = new Department();
         userDepartment.setName("userDepartment");
         when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(userDepartment));
@@ -115,34 +118,36 @@ public class TicketPermissionEvaluatorTest {
         ticketDepartment.setName("ticketDepartment");
         Ticket ticket = new Ticket();
         ticket.setDepartment(ticketDepartment);
-        ticket.setAuthor("differentUsername");
+        ticket.setAuthor("author");
 
         boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "read");
+                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, permission);
 
         assertThat(hasPermission).isFalse();
     }
 
-    @Test
+    @ParameterizedTest
     @WithMockUser(username = "author", authorities = "USER")
-    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsAuthor() {
+    @ValueSource(strings = {"read", "respond"})
+    public void hasPermission_shouldReturnFalse_givenRoleUserAndUserIsAuthor(String permission) {
         Ticket ticket = new Ticket();
         ticket.setAuthor("author");
 
         boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "read");
+                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, permission);
 
         assertThat(hasPermission).isTrue();
     }
 
-    @Test
+    @ParameterizedTest
     @WithMockUser(username = "notAuthor", authorities = "USER")
-    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsNotAuthor() {
+    @ValueSource(strings = {"read", "respond"})
+    public void hasPermission_shouldReturnFalse_givenRoleUserAndUserIsNotAuthor(String permission) {
         Ticket ticket = new Ticket();
         ticket.setAuthor("author");
 
         boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "read");
+                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, permission);
 
         assertThat(hasPermission).isFalse();
     }
@@ -159,7 +164,7 @@ public class TicketPermissionEvaluatorTest {
 
     @Test
     @WithMockUser(authorities = "USER")
-    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsNotAuthr() {
+    public void hasPermission_shouldReturnFalse_givenPermissionEditAndRoleUserAndUserIsNotAuthor() {
         Ticket ticket = new Ticket();
 
         boolean hasPermission = ticketPermissionEvaluator
@@ -170,7 +175,7 @@ public class TicketPermissionEvaluatorTest {
 
     @Test
     @WithMockUser(authorities = "STAFF")
-    public void hasPermission_shouldReturnFalse_givenPermissionReadAndRoleUserAndUserIsNotAukthr() {
+    public void hasPermission_shouldReturnTrue_givenPermissionEditAndRoleStaffAndMatchingDepartment() {
         Department userDepartment = new Department();
         userDepartment.setName("userDepartment");
         when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(userDepartment));
@@ -183,5 +188,22 @@ public class TicketPermissionEvaluatorTest {
 
         assertThat(hasPermission).isTrue();
     }
+	
+	@Test
+    @WithMockUser(authorities = "STAFF")
+    public void hasPermission_shouldReturnFalse_givenPermissionEditAndRoleStaffAndNotMatchingDepartment() {
+        Department userDepartment = new Department();
+        userDepartment.setName("userDepartment");
+        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(userDepartment));
+       
+        Ticket ticket = new Ticket();
+		Department ticketDepartment = new Department();
+        userDepartment.setName("ticketDepartment");
+        ticket.setDepartment(ticketDepartment);
 
+        boolean hasPermission = ticketPermissionEvaluator
+                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "edit");
+
+        assertThat(hasPermission).isFalse();
+    }
 }

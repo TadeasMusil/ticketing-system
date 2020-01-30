@@ -39,9 +39,15 @@ public class TicketPermissionEvaluator implements PermissionEvaluator {
             else if(permission.equals("read")){
                 return isUserAuthorOf(ticket) || isUserInSameDepartmentAs(ticket);
             }
+            else if(permission.equals("respond")){
+                return isUserAuthorOf(ticket) || isUserInSameDepartmentAs(ticket);
+            }
         } 
         else if (userHasRole("USER")) {
             if (permission.equals("read")) {
+                return isUserAuthorOf(ticket);
+            }
+            else if(permission.equals("respond")){
                 return isUserAuthorOf(ticket);
             } 
             else if (permission.equals("edit")) {

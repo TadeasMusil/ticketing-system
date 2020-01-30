@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Role;
 import tadeas_musil.ticketing_system.entity.Ticket;
+import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.TicketToken;
 import tadeas_musil.ticketing_system.entity.User;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
@@ -42,7 +43,6 @@ public class TicketServiceImpl implements TicketService {
     private final TicketTokenService ticketTokenService;
 
     private final TicketEventService ticketEventService;
-
 
     @Value("${ticket.access_email.subject}")
     private String accessEmailSubject;
@@ -95,7 +95,7 @@ public class TicketServiceImpl implements TicketService {
         return false;
     }
 
-    @Override 
+    @Override
     public void updateDepartment(Long ticketId, Department department) {
         if (ticketRepository.existsById(ticketId)) {
             if (departmentRepository.existsById(department.getName())) {
@@ -130,9 +130,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     private boolean anyRoleMatch(Set<Role> roles, String... stringRoles) {
-        return roles.stream()
-        .map(r -> r.getName())
-        .anyMatch(Set.of(stringRoles)::contains);
+        return roles.stream().map(r -> r.getName()).anyMatch(Set.of(stringRoles)::contains);
     }
 
     @Override
@@ -143,5 +141,15 @@ public class TicketServiceImpl implements TicketService {
         } else {
             throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
         }
+    }
+
+    @Override
+    public void createResponse(Long ticketId, String content) {
+        if (ticketRepository.existsById(ticketId)) {
+            ticketEventService.createEvent(ticketId, TicketEventType.RESPONSE, content);
+        } else {
+            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
+        }
+
     }
 }

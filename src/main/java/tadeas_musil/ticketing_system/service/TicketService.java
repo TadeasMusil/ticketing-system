@@ -26,4 +26,6 @@ public interface TicketService {
 
     void updateStatus(Long ticketId, boolean isClosed);
 
+    void createResponse(Long ticketId, String content);
+
 }

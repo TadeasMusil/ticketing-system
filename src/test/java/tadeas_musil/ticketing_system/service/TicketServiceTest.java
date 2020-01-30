@@ -206,7 +206,7 @@ public class TicketServiceTest {
   }
 
   @Test
-  public void updateStatus_shouldUpdateStatus_givenExistingTicket() throws Exception {
+  public void updateStatus_shouldCloseTicket_givenExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     Long ticketId = Long.valueOf(1);
 
@@ -217,7 +217,7 @@ public class TicketServiceTest {
   }
 
    @Test
-  public void updateStatus_shouldUpdateStatuss_givenExistingTicket() throws Exception {
+  public void updateStatus_shouldReopenTicket_givenExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     Long ticketId = Long.valueOf(1);
 
@@ -232,5 +232,22 @@ public class TicketServiceTest {
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
     assertThrows(IllegalArgumentException.class, () -> ticketService.updateStatus(Long.valueOf(5), true));
+  }
+
+  @Test
+  public void createResponse_shouldThrowException_givenNonExistingTicket() throws Exception {
+    when(ticketRepository.existsById(anyLong())).thenReturn(false);
+
+    assertThrows(IllegalArgumentException.class, () -> ticketService.createResponse(Long.valueOf(5), "content"));
+  }
+
+  @Test
+  public void createResponse_shouldcreateResponse_givenExistingTicket() throws Exception {
+    when(ticketRepository.existsById(anyLong())).thenReturn(true);
+    Long ticketId = Long.valueOf(1);
+    
+    ticketService.createResponse(ticketId, "content");
+
+    verify(ticketEventService).createEvent(ticketId, TicketEventType.RESPONSE, "content");
   }
 }
