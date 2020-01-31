@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,28 +20,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
+import tadeas_musil.ticketing_system.service.CannedResponseService;
 import tadeas_musil.ticketing_system.service.DepartmentService;
 import tadeas_musil.ticketing_system.service.TicketService;
 import tadeas_musil.ticketing_system.service.UserService;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/ticket")
 public class TicketController {
 
-    @Autowired
-    private TicketService ticketService;
+    private final TicketService ticketService;
+    
+    private final DepartmentService departmentService;
+    
+    private final UserService userService;
 
-    @Autowired
-    private DepartmentService departmentService;
-
-    @Autowired
-    private UserService userService;
-
-   
+    private final CannedResponseService cannedResponseService;
 
     @GetMapping
     public String showTicketForm(Model model) {
@@ -69,6 +68,8 @@ public class TicketController {
         model.addAttribute("ticket", ticketService.getById(ticketId));
         model.addAttribute("departments", departmentService.getAllDepartments());
         model.addAttribute("staffMembers", userService.getAllStaffMembers());
+        model.addAttribute("cannedResponses", cannedResponseService.getAllResponses());
+
         if (!model.containsAttribute("response")) {
             model.addAttribute("response", new TicketEvent());
         }

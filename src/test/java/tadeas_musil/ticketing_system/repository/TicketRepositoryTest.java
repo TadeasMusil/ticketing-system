@@ -32,15 +32,13 @@ public class TicketRepositoryTest {
 
         ticket.addEvent(event);
         ticket = ticketRepository.save(ticket);
-        
-        Ticket t = ticketRepository.save(new Ticket());
        
-      Ticket result = ticketRepository.findByIdAndFetchEvents(Long.valueOf(1)).get();
+        Ticket result = ticketRepository.findByIdAndFetchEvents(Long.valueOf(1)).get();
 
-      assertThat(result).hasFieldOrPropertyWithValue("content", "content");
-      assertThat(result.getEvents()).hasSize(1)
-                                    .first()
-                                    .hasFieldOrPropertyWithValue("content", "eventContent");
+        assertThat(result).hasFieldOrPropertyWithValue("content", "content");
+        assertThat(result.getEvents()).hasSize(1)
+                                        .first()
+                                        .hasFieldOrPropertyWithValue("content", "eventContent");
 
     }
 

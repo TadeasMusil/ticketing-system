@@ -2,7 +2,6 @@ package tadeas_musil.ticketing_system.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,6 @@ import tadeas_musil.ticketing_system.entity.User;
 import tadeas_musil.ticketing_system.repository.DepartmentRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
 import tadeas_musil.ticketing_system.service.DepartmentService;
-import tadeas_musil.ticketing_system.service.UserService;
 
 @Service
 @RequiredArgsConstructor

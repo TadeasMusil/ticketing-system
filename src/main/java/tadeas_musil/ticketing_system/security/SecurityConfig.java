@@ -36,6 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity
         .authorizeRequests()
         .expressionHandler(webExpressionHandler())
+        .antMatchers("/cannedResponse/form").hasAnyAuthority("ADMIN", "STAFF")
         .antMatchers("/user/**").authenticated()
         .antMatchers("/ticket/**").authenticated()
         .anyRequest()
