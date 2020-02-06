@@ -2,6 +2,7 @@ package tadeas_musil.ticketing_system.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -32,9 +33,9 @@ public class CannedResponseServiceTest {
 
   @Test
   public void getResponseByName_shouldThrowException_givenNonExistingName() {
-    when(cannedResponseRepository.findByName(anyString())).thenReturn(Optional.empty());
+    when(cannedResponseRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class, () -> cannedResponseService.getResponseByName("nonExistingName"));
+    assertThrows(IllegalArgumentException.class, () -> cannedResponseService.getResponseById(Long.valueOf(1)));
   }
 
   @Test
@@ -42,9 +43,9 @@ public class CannedResponseServiceTest {
     CannedResponse response = new CannedResponse();
     response.setName("name");
 
-    when(cannedResponseRepository.findByName(anyString())).thenReturn(Optional.of(response));
+    when(cannedResponseRepository.findById(anyLong())).thenReturn(Optional.of(response));
 
-    CannedResponse cannedResponse = cannedResponseService.getResponseByName("name");
+    CannedResponse cannedResponse = cannedResponseService.getResponseById(Long.valueOf(1));
 
     assertThat(cannedResponse).isEqualTo(response);
   }

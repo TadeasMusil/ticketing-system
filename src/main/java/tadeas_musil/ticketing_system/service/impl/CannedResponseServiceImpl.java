@@ -21,8 +21,8 @@ public class CannedResponseServiceImpl implements CannedResponseService {
     }
 
     @Override
-    public CannedResponse getResponseByName(String name) {
-        return cannedResponseRepository.findByName(name)
+    public CannedResponse getResponseById(Long id) {
+        return cannedResponseRepository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("Response not found"));
 
     }
@@ -30,5 +30,10 @@ public class CannedResponseServiceImpl implements CannedResponseService {
     @Override
     public CannedResponse saveResponse(CannedResponse cannedResponse) {
         return cannedResponseRepository.save(cannedResponse);
+    }
+
+    @Override
+    public void deleteResponse(CannedResponse cannedResponse) {
+        cannedResponseRepository.delete(cannedResponse);
     }
 }

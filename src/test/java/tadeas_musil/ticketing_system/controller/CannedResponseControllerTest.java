@@ -1,6 +1,8 @@
 package tadeas_musil.ticketing_system.controller;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,26 +38,25 @@ public class CannedResponseControllerTest {
     private CannedResponseRepository cannedResponseRepository;
     
     @Test
-    @WithMockUser(authorities = "ADMIN")
+    @WithMockUser
     public void shouldShowCannedResponseForm() throws Exception {
-    	mockMvc.perform(get("/cannedResponse/form"))
+    	mockMvc.perform(get("/cannedResponse"))
     	.andExpect(status().isOk())
     	.andExpect(model().attributeExists("cannedResponses", "cannedResponse"))
     	.andExpect(view().name("canned-response-form"));
     }
 
     @Test
-    
+    @WithMockUser  
     public void getResponse_shouldReturnCorrectCannedResponse() throws Exception {
         CannedResponse cannedResponse = new CannedResponse();
         cannedResponse.setName("responseName");
         cannedResponse.setContent("content");
         cannedResponse.setId(Long.valueOf(1));
         
-        when(cannedResponseService.getResponseByName(anyString())).thenReturn(cannedResponse);
+        when(cannedResponseService.getResponseById(anyLong())).thenReturn(cannedResponse);
         
-        mockMvc.perform(get("/cannedResponse")
-            .param("name", "responseName"))
+        mockMvc.perform(get("/cannedResponse/1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value(cannedResponse.getName()))
         .andExpect(jsonPath("$.content").value(cannedResponse.getContent()))
@@ -63,14 +64,15 @@ public class CannedResponseControllerTest {
     }
 
     @Test
-    @WithMockUser(authorities = "ADMIN")
+    @WithMockUser
     public void processingResponseForm_shouldReturnFormWithErrors_givenInvalidCannedResponse() throws Exception {
         CannedResponse response = new CannedResponse();
         response.setContent("content");
         response.setName("name");
         when(cannedResponseRepository.existsByName(anyString())).thenReturn(true);
         
-        mockMvc.perform(post("/cannedResponse/form")
+        mockMvc.perform(post("/cannedResponse")
+            .param("action", "save")
             .flashAttr("cannedResponse", response)
             .with(csrf()))
         .andExpect(status().isOk())
@@ -80,20 +82,36 @@ public class CannedResponseControllerTest {
     }
 
     @Test 
-      @WithMockUser(authorities = "ADMIN")
+      @WithMockUser
       public void processingResponseForm_shouldRedirectToForm_givenValidCannedResponse() throws Exception {
-          CannedResponse response = new CannedResponse();
-          response.setContent("content");
-          response.setName("name");
+          CannedResponse cannedResponse = new CannedResponse();
+          cannedResponse.setContent("content");
+          cannedResponse.setName("name");
           when(cannedResponseRepository.existsByName(anyString())).thenReturn(false);
           
-          mockMvc.perform(post("/cannedResponse/form")
-              .flashAttr("cannedResponse", response)
+          mockMvc.perform(post("/cannedResponse")
+                .param("action", "save")
+              .flashAttr("cannedResponse", cannedResponse)
               .with(csrf()))
           .andExpect(status().is3xxRedirection())
-          .andExpect(redirectedUrl("/cannedResponse/form"));
+          .andExpect(redirectedUrl("/cannedResponse"));
           
+          verify(cannedResponseService).saveResponse(cannedResponse);
       }
     
-   
+      @Test 
+      @WithMockUser
+      public void deleteResponse_shouldDeleteResponse_givenValidCannedResponse() throws Exception {
+          CannedResponse cannedResponse = new CannedResponse();
+          
+          mockMvc.perform(post("/cannedResponse")
+                .param("action", "delete")
+              .flashAttr("cannedResponse", cannedResponse)
+              .with(csrf()))
+          .andExpect(status().is3xxRedirection())
+          .andExpect(redirectedUrl("/cannedResponse"));
+
+          verify(cannedResponseService).deleteResponse(cannedResponse);
+          
+      }
 }

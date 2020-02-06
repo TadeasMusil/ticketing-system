@@ -11,7 +11,9 @@ public interface CannedResponseService {
 
     List<CannedResponse> getAllResponses();
 
-	CannedResponse getResponseByName(String name);
+	CannedResponse getResponseById(Long id);
 
 	CannedResponse saveResponse(CannedResponse cannedResponse);
+
+	void deleteResponse(CannedResponse cannedResponse);
 }

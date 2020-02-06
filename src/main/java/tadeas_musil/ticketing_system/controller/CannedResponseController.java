@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,27 +24,33 @@ public class CannedResponseController {
 
 	private final CannedResponseService cannedResponseService;
 
-	@GetMapping(params = "name")
+	@GetMapping("/{id}")
 	@ResponseBody
-	public CannedResponse getResponse(@RequestParam String name) {
-		return cannedResponseService.getResponseByName(name);
+	public CannedResponse getResponse(@PathVariable Long id) {
+		return cannedResponseService.getResponseById(id);
 	}
 
-	@GetMapping("/form")
+	@GetMapping()
 	public String showCannedResponseForm(Model model) {
 		model.addAttribute("cannedResponses", cannedResponseService.getAllResponses());
 		model.addAttribute("cannedResponse", new CannedResponse());
 		return "canned-response-form";
 	}
 
-	@PostMapping("/form")
+	@PostMapping(params = "action=save")
 	public String proccessResponseForm(@Valid @ModelAttribute CannedResponse cannedResponse, BindingResult bindingResult, Model model) {
 		if(bindingResult.hasErrors()){
 			model.addAttribute("cannedResponses", cannedResponseService.getAllResponses());
 			return "canned-response-form";
 		}
 		cannedResponseService.saveResponse(cannedResponse);
-		return "redirect:/cannedResponse/form";
+		return "redirect:/cannedResponse";
+	}
+
+	@PostMapping(params = "action=delete")
+	public String deleteResponse(@ModelAttribute CannedResponse cannedResponse) {
+		cannedResponseService.deleteResponse(cannedResponse);
+		return "redirect:/cannedResponse";
 	}
 
 }
