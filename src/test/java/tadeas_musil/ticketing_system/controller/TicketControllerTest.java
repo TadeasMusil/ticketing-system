@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import java.util.List;
 
@@ -71,17 +72,24 @@ public class TicketControllerTest {
     public void creatingTicket_shouldCreateTicket_givenValidTicket() throws Exception{
         
         Ticket validTicket = new Ticket();
+        validTicket.setId(Long.valueOf(1));
         validTicket.setAuthor("author");
-        validTicket.setContent("content");
         validTicket.setSubject("subject");
         
-       
+
+        TicketEvent event = new TicketEvent();
+        event.setContent("content");
+        validTicket.addEvent(event);
+
+        when(ticketService.createTicket(any())).thenReturn(validTicket);
+
         mockMvc.perform(post("/ticket")
                 .flashAttr("ticket", validTicket)
                 .with(csrf()))
-           .andExpect(status().isOk())
            .andExpect(model().hasNoErrors())
-           .andExpect(view().name("index"));
+           .andExpect(status().is3xxRedirection())
+           .andExpect(redirectedUrl("/ticket/" + validTicket.getId()));
+
 
         verify(ticketService).createTicket(validTicket);
            

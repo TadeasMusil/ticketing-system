@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Role;
 import tadeas_musil.ticketing_system.entity.Ticket;
+import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.TicketToken;
 import tadeas_musil.ticketing_system.entity.User;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
@@ -61,7 +62,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Ticket createTicket(Ticket ticket) {
-        ticket.setPriority(Priority.MEDIUM);
+        ticket.getEvents().get(0).setType(TicketEventType.CREATE);
         return ticketRepository.save(ticket);
     }
 

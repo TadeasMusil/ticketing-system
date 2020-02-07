@@ -37,9 +37,6 @@ public class Ticket {
     @NotBlank 
     private String subject;
 
-    @NotBlank 
-    private String content;
-
     private boolean isClosed;
 
     @Enumerated(EnumType.STRING)
@@ -58,8 +55,7 @@ public class Ticket {
     private LocalDateTime created;
     
     @Valid 
-    @OneToMany(mappedBy = "ticket", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
-            CascadeType.REFRESH })
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
     private List<TicketEvent> events = new ArrayList<>();
 
     public void addEvent(TicketEvent event){

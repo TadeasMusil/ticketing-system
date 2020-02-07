@@ -23,9 +23,9 @@ public class TicketRepositoryTest {
     private DepartmentRepository departmentRepository;
 
     @Test
-    public void findByName_shouldFindRole_givenExistingRole() {
+    public void findByIdAndFetchEvents_shouldFindRole_givenExistingRole() {
         Ticket ticket = new Ticket();
-        ticket.setContent("content");
+        ticket.setAuthor("author");
 
         TicketEvent event = new TicketEvent();
         event.setContent("eventContent");
@@ -35,7 +35,7 @@ public class TicketRepositoryTest {
        
         Ticket result = ticketRepository.findByIdAndFetchEvents(Long.valueOf(1)).get();
 
-        assertThat(result).hasFieldOrPropertyWithValue("content", "content");
+        assertThat(result).hasFieldOrPropertyWithValue("author", "author");
         assertThat(result.getEvents()).hasSize(1)
                                         .first()
                                         .hasFieldOrPropertyWithValue("content", "eventContent");

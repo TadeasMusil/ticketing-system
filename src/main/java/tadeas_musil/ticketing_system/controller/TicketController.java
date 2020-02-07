@@ -3,6 +3,7 @@ package tadeas_musil.ticketing_system.controller;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 
@@ -25,6 +26,7 @@ import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
+import tadeas_musil.ticketing_system.entity.enums.TicketEventType;
 import tadeas_musil.ticketing_system.service.CannedResponseService;
 import tadeas_musil.ticketing_system.service.DepartmentService;
 import tadeas_musil.ticketing_system.service.TicketService;
@@ -36,29 +38,33 @@ import tadeas_musil.ticketing_system.service.UserService;
 public class TicketController {
 
     private final TicketService ticketService;
-    
+
     private final DepartmentService departmentService;
-    
+
     private final UserService userService;
 
     private final CannedResponseService cannedResponseService;
 
     @GetMapping
     public String showTicketForm(Model model) {
-        Ticket ticket = new Ticket();
         List<Department> departments = departmentService.getAllDepartments();
         model.addAttribute("departments", departments);
+
+        Ticket ticket = new Ticket();
+        ticket.addEvent(new TicketEvent());
         model.addAttribute("ticket", ticket);
+        
         return "create-ticket";
     }
 
     @PostMapping
-    public String createTicket(@Valid @ModelAttribute Ticket ticket, BindingResult bindingResult) {
+    public String createTicket(@Valid @ModelAttribute Ticket ticket,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "create-ticket";
         }
-        ticketService.createTicket(ticket);
-        return "index";
+        Ticket createdTicket = ticketService.createTicket(ticket);
+        return "redirect:" + "/ticket/" + createdTicket.getId();
 
     }
 

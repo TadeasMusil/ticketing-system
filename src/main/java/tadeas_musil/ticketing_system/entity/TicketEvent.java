@@ -13,12 +13,14 @@ import javax.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import tadeas_musil.ticketing_system.entity.enums.TicketEventType;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class TicketEvent {
 
     @Id
@@ -40,7 +42,10 @@ public class TicketEvent {
     private LocalDateTime created;
 
     
-    @Override
+    public TicketEvent(TicketEventType create) {
+	}
+
+	@Override
     public int hashCode() {
         return 31;
     }
