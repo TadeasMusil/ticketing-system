@@ -1,0 +1,47 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+
+<head>
+</head>
+
+<body>
+    <article class="content " layout:fragment="~{content}">
+        <section class="section">
+            <div class="row sameheight-container ticket-access-container">
+                <div class="col-md-6">
+                    <div class="card card-block sameheight-item">
+                        <div class="title-block">
+                            <h3 class="title"> Check ticket status </h3>
+                        </div>
+                        <div class="title-block">
+                            <h6> You will receive an email with a temporary link to your ticket </h6>
+                        </div>
+                        <!--    Form   -->
+                        <form th:action="@{/accessForm}" th:object="${ticketAccessForm}"
+                            method="POST" role="form" class="ticket-access-form">
+                            <!--    ID field   -->
+                            <div class="form-group">
+                                <label>Ticket ID</label>
+                                <input type="number" th:field="*{ticketId}" class="form-control" id="exampleInputEmail1">
+                            </div>
+                            <!--    Email field   -->
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Email</label>
+                                <input type="email" th:field="*{authorEmail}" class="form-control"
+                                    id="exampleInputPassword1">
+                            </div>
+                            <span class="error-message" th:if="${#fields.hasErrors('global')}" th:errors="*{global}"></span>
+                            <!--    Submit button   -->
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </article>
+</body>
+
+</html>
