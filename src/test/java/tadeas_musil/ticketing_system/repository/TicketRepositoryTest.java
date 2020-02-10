@@ -99,4 +99,17 @@ public class TicketRepositoryTest {
         assertThat(updatedTicket.isClosed()).isEqualTo(true);
     }
 
+    @Test
+    public void countByOwnerAndStatus_shouldReturnTwo() {
+        ticketRepository.save(new Ticket("Jim", false));
+        ticketRepository.save(new Ticket("Bob", true));
+
+        ticketRepository.save(new Ticket("Jim", true));
+        ticketRepository.save(new Ticket("Jim", true));
+
+        long count = ticketRepository.countByOwnerAndIsClosed("Jim", true);
+
+        assertThat(count).isEqualTo(2L);
+    }
+
 }

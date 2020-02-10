@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
-import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @Service()
@@ -27,5 +26,4 @@ public interface TicketService {
     void updateStatus(Long ticketId, boolean isClosed);
 
     void createResponse(Long ticketId, String content);
-
 }

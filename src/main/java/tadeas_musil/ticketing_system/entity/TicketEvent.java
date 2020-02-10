@@ -41,10 +41,6 @@ public class TicketEvent {
     @CreationTimestamp
     private LocalDateTime created;
 
-    
-    public TicketEvent(TicketEventType create) {
-	}
-
 	@Override
     public int hashCode() {
         return 31;
@@ -63,4 +59,12 @@ public class TicketEvent {
                id.equals(other.getId());
     }
 
+    public TicketEvent(String author) {
+        this.author = author;
+    }
+
+    public TicketEvent(String author, TicketEventType type) {
+        this.type = type;
+        this.author = author;
+    }
 }

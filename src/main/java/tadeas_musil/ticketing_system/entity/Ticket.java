@@ -89,5 +89,10 @@ public class Ticket {
         this.id = id;
     }
 
+    public Ticket(@NotBlank String owner, boolean isClosed) {
+        this.isClosed = isClosed;
+        this.owner = owner;
+    }
+
     
 }

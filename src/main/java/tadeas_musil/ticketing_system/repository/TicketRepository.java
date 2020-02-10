@@ -37,4 +37,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("UPDATE Ticket t SET t.isClosed = ?2 WHERE t.id = ?1")
   void setIsClosed(Long ticketId, boolean isClosed);
+
+  @Query("SELECT COUNT(t) FROM  Ticket t WHERE t.owner =?1 AND isClosed = ?2")
+  long countByOwnerAndIsClosed(String username, boolean isClosed);
 }
