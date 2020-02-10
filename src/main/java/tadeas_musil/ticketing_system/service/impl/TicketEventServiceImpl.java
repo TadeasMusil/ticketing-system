@@ -2,6 +2,9 @@ package tadeas_musil.ticketing_system.service.impl;
 
 import java.security.AccessControlException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,5 +33,11 @@ public class TicketEventServiceImpl implements TicketEventService {
         event.setContent(content);
         event.setType(type);
         return ticketEventRepository.save(event);
+    }
+
+    @Override
+    public Page<TicketEvent> getEventsByAuthor(String username, int page) {
+        Pageable pageable = PageRequest.of(page, 8);
+        return ticketEventRepository.findByAuthorOrderByCreatedDesc(username, pageable);
     }
 }

@@ -7,5 +7,7 @@ public enum TicketEventType {
     OWNER_CHANGE,
     PRIORITY_CHANGE,
     STATUS_CHANGE, 
-    DEPARTMENT_CHANGE
+    DEPARTMENT_CHANGE,
+    REOPEN,
+    CLOSE
 }

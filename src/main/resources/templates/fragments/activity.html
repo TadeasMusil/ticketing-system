@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="activity-list" class="col-md-12 admin-panel-layout__content">
+        <div title="" class="widget">
+            <div class="admin-panel-activity">
+                <div class="">
+                    <h2 class="header__title">Last Activity</h2>
+                </div>
+                <div th:each="event : ${slice}" class="mb-4">
+                    <div th:switch="${event.type}">
+                        <!--    Type 'CREATE'   -->
+                        <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).CREATE}">
+                            <i class="fas fa-plus ticket-event-icon mr-3"></i>
+                            <span th:replace="~{fragments/activity :: event('created')}"></span>
+                        </div>
+                        <!--    Type 'DEPARTMENT_CHANGE'   -->
+                        <div
+                            th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).DEPARTMENT_CHANGE}">
+                            <i class="fas fa-building ticket-event-icon mr-3"></i>
+                            <span th:replace="~{fragments/activity :: event('changed priority of')}"></span>
+                        </div>
+                        <!--    Type 'OWNER_CHANGE'   -->
+                        <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).OWNER_CHANGE}">
+                            <i class="fas fa-user ticket-event-icon mr-3"></i>
+                            <span th:replace="~{fragments/activity :: event('assigned')}"></span>
+                        </div>
+                        <!--    Type 'CLOSE'   -->
+                        <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).CLOSE}">
+                            <i class="fas fa-lock ticket-event-icon mr-3"></i>
+                            <span th:replace="~{fragments/activity :: event('closed')}"></span>
+                        </div>
+                        <!--    Type 'REOPEN'   -->
+                        <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).REOPEN}">
+                            <i class="fas fa-lock-open ticket-event-icon mr-3"></i>
+                            <span th:replace="~{fragments/activity :: event('reopened')}"></span>
+                        </div>
+                        <!--    Type 'PRIORITY_CHANGE'   -->
+                        <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).PRIORITY_CHANGE}">
+                            <i class="fas fa-list-ul ticket-event-icon mr-3"></i>
+                            <span th:replace="~{fragments/activity :: event('changed priority of')}"></span>
+                        </div>
+                        <!--    Type 'RESPONSE'   -->
+                        <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).RESPONSE}">
+                            <span th:replace="~{fragments/activity :: event('responded to')}"></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--    Pagination   -->
+            <ul class="pagination">
+                <li th:classappend="${slice.isFirst()} ? 'disabled' : ''" class="page-item">
+                    <a class="page-link" th:href="@{/?page=0}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <th:block
+                    th:with="startIndex=${slice.number+1 % 10 == 0 ? slice.number+1 : (slice.number lt 10 ? 1 : slice.number + 1 -(slice.number+1 % 10))}">
+                    <li th:classappend="${i - 1 == slice.number} ? 'disabled active' : ''" class="page-item" 
+                        th:each="i : ${#numbers.sequence(startIndex, slice.number lt 10 ? slice.getTotalPages() : startIndex + 10, 1)}">
+                    <a class="page-link" th:text="${i}"
+                    th:href="@{/?page={pageNumber}(pageNumber=${i - 1})}"></a>
+                </li>
+            </th:block>
+
+                <li th:classappend="${slice.isLast()} ? 'disabled' : ''" class="page-item">
+                    <a class="page-link" th:href="@{/?page={pageNumber}(pageNumber=${slice.getTotalPages() - 1})}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+        <span th:fragment="event(eventText)">
+            <span>
+                <b th:text="${event.author + ' '}"></b>
+                <span th:text="${eventText +  ' ticket '}"></span>
+                <span>
+                    <a th:text="${'#' + event.ticket.id}" class="activity-row__ticket-link"
+                        th:href="@{/ticket/{id}(id=${event.ticket.id})}">
+                    </a>
+                </span>
+                <span th:text="${' at ' + #temporals.format(event.created, 'dd-MM-yyyy HH:mm:ss')}"></span>
+                <span>
+                    <div class="separator"></div>
+                </span>
+            </span>
+        </span>
+</body>
+
+</html>

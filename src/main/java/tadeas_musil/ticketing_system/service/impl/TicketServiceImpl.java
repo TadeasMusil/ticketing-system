@@ -137,7 +137,11 @@ public class TicketServiceImpl implements TicketService {
     public void updateStatus(Long ticketId, boolean isClosed) {
         if (ticketRepository.existsById(ticketId)) {
             ticketRepository.setIsClosed(ticketId, isClosed);
-            ticketEventService.createEvent(ticketId, TicketEventType.STATUS_CHANGE, isClosed ? "CLOSED" : "OPEN");
+            if (isClosed) {
+                ticketEventService.createEvent(ticketId, TicketEventType.CLOSE, "CLOSED");
+            } else {
+                ticketEventService.createEvent(ticketId, TicketEventType.REOPEN, "OPEN");
+            }
         } else {
             throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
         }
