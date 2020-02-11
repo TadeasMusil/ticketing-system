@@ -3,11 +3,11 @@
 
 <body>
 
-    <div th:fragment="activity-list" class="col-md-12 admin-panel-layout__content">
+    <div th:fragment="activity-list(title)" class="col-md-12 admin-panel-layout__content">
         <div title="" class="widget">
             <div class="admin-panel-activity">
                 <div class="">
-                    <h2 class="header__title">Last Activity</h2>
+                    <h2 class="header__title" th:text="${title}"></h2>
                 </div>
                 <div th:each="event : ${slice}" class="mb-4">
                     <div th:switch="${event.type}">

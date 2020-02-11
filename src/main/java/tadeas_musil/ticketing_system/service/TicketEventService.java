@@ -12,4 +12,9 @@ public interface TicketEventService {
     TicketEvent createEvent(Long ticketId, TicketEventType type, String content);
 
     Page<TicketEvent> getEventsByAuthor(String username, int page);
+
+    Page<TicketEvent> getEventsByUsersDepartments(String username, int page);
+
+    Page<TicketEvent> getAllEvents(int page);
+
 }

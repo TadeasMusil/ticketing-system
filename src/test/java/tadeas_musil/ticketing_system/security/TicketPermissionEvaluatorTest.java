@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,7 +99,7 @@ public class TicketPermissionEvaluatorTest {
         ticket.setDepartment(department);
         ticket.setAuthor("username");
 
-        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(department));
+        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(Set.of(department));
 
         boolean hasPermission = ticketPermissionEvaluator
                 .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, permission);
@@ -112,7 +113,7 @@ public class TicketPermissionEvaluatorTest {
     public void hasPermission_shouldReturnFalse_givenRoleStaffAndDifferentDepartmentAndAuthor(String permission) {
         Department userDepartment = new Department();
         userDepartment.setName("userDepartment");
-        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(userDepartment));
+        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(Set.of(userDepartment));
 
         Department ticketDepartment = new Department();
         ticketDepartment.setName("ticketDepartment");
@@ -178,7 +179,7 @@ public class TicketPermissionEvaluatorTest {
     public void hasPermission_shouldReturnTrue_givenPermissionEditAndRoleStaffAndMatchingDepartment() {
         Department userDepartment = new Department();
         userDepartment.setName("userDepartment");
-        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(userDepartment));
+        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(Set.of(userDepartment));
        
         Ticket ticket = new Ticket();
         ticket.setDepartment(userDepartment);
@@ -194,7 +195,7 @@ public class TicketPermissionEvaluatorTest {
     public void hasPermission_shouldReturnFalse_givenPermissionEditAndRoleStaffAndNotMatchingDepartment() {
         Department userDepartment = new Department();
         userDepartment.setName("userDepartment");
-        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(List.of(userDepartment));
+        when(departmentService.getDepartmentsByUsername(anyString())).thenReturn(Set.of(userDepartment));
        
         Ticket ticket = new Ticket();
 		Department ticketDepartment = new Department();

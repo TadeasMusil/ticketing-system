@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,11 +51,11 @@ public class DepartmentServiceTest {
     User user = new User();
     Department department = new Department();
     department.setName("departmentName");
-    user.setDepartments(List.of(department));
+    user.setDepartments(Set.of(department));
     
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
 
-    List<Department> departments = departmentService.getDepartmentsByUsername("user");
+    Set<Department> departments = departmentService.getDepartmentsByUsername("user");
     
     assertThat(departments).hasSize(1)
                           .first().hasFieldOrPropertyWithValue("name", "departmentName");

@@ -17,8 +17,7 @@ import org.springframework.security.web.access.expression.DefaultWebSecurityExpr
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-  prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -36,9 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity
         .authorizeRequests()
         .expressionHandler(webExpressionHandler())
-        .antMatchers("/cannedResponse/**").authenticated()
-        .antMatchers("/user/**").authenticated()
-        .antMatchers("/ticket/**").authenticated()
+        .antMatchers("/cannedResponse/**", "/user/**", "/ticket/**", "/activity/**").authenticated()
         .anyRequest()
         .permitAll()
             .and()

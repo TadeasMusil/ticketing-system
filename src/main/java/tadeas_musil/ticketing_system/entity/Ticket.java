@@ -94,5 +94,9 @@ public class Ticket {
         this.owner = owner;
     }
 
+    public Ticket(Department department) {
+        this.department = department;
+    }
+
     
 }

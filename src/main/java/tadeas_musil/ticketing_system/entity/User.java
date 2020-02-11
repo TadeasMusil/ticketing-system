@@ -87,7 +87,7 @@ public class User {
     @JoinTable(name = "app_user_department",
                 joinColumns = @JoinColumn(name = "app_user_id"),
                 inverseJoinColumns = @JoinColumn(name = "department_name"))
-    private List<Department> departments = new ArrayList<>();
+    private Set<Department> departments = new HashSet<>();
 
         
 }

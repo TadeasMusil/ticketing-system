@@ -2,6 +2,9 @@ package tadeas_musil.ticketing_system.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -9,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 
+import tadeas_musil.ticketing_system.entity.Department;
+import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.enums.TicketEventType;
 
@@ -18,6 +23,12 @@ public class TicketEventRepositoryTest {
 
     @Autowired
     private TicketEventRepository ticketEventRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+    
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @Test
     public void findAllByOrderByNameAsc_shouldReturnTicketEventsInCorrectOrder() {
@@ -59,6 +70,32 @@ public class TicketEventRepositoryTest {
         assertThat(eventsPage)
         .hasSize(3)
         .startsWith(third, second, first);
+    }
+
+    @Test
+    public void findByDepartments_() {
+        Department firstDepartment = departmentRepository.save(new Department("firstDepartment"));
+        Department secondDepartment = departmentRepository.save(new Department("secondDepartment"));
+        Department thirdDepartment = departmentRepository.save(new Department("thirdDepartment"));
+        
+        Ticket firstTicket = new Ticket(firstDepartment);
+        firstTicket.addEvent(new TicketEvent("Jim"));
+        
+        Ticket secondTicket = new Ticket(secondDepartment);
+        secondTicket.addEvent(new TicketEvent("Bob"));
+        
+        Ticket thirdTicket = new Ticket(thirdDepartment);
+        thirdTicket.addEvent(new TicketEvent("Adam"));
+
+        ticketRepository.saveAll(List.of(firstTicket, secondTicket, thirdTicket));
+
+        Page<TicketEvent> eventsPage = ticketEventRepository
+        .findByDepartmentsOrderByCreatedDesc(Set.of(firstDepartment, secondDepartment), PageRequest.of(0, 5));
+
+        assertThat(eventsPage)
+        .hasSize(2)
+        .first()
+        .hasFieldOrPropertyWithValue("author", "Bob");
     }
 
 }

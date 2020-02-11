@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+
+<body>
+    <article class="content dashboard-page" layout:fragment="~{content}">
+    <div  th:replace="~{fragments/activity :: activity-list('Activity of my departments')}"></div>
+</article>
+</body>
+
+</html>

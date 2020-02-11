@@ -1,6 +1,7 @@
 package tadeas_musil.ticketing_system.service.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public List<Department> getDepartmentsByUsername(String username) {
+    public Set<Department> getDepartmentsByUsername(String username) {
        User user = userRepository.findByUsername(username)
                                 .orElseThrow(() -> new UsernameNotFoundException(username));
         return user.getDepartments();

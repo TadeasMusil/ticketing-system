@@ -2,6 +2,7 @@ package tadeas_musil.ticketing_system.security;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -65,7 +66,7 @@ public class TicketPermissionEvaluator implements PermissionEvaluator {
         return ticket.getAuthor().equals(authentication.getName());
     }
     private boolean isUserInSameDepartmentAs(Ticket ticket){
-        List<Department> departments = departmentService.getDepartmentsByUsername(authentication.getName());
+        Set<Department> departments = departmentService.getDepartmentsByUsername(authentication.getName());
         return departments.contains(ticket.getDepartment());
     }
 
