@@ -132,4 +132,11 @@ public class TicketController {
         return "redirect:" + "/ticket/" + ticketId;
     }
 
+    @GetMapping("/assigned")
+    @PreAuthorize("hasAnyAuthority('STAFF', 'ADMIN')")
+    public String showAssignedTickets(Principal principal, Model model, @RequestParam(defaultValue = "0") int page) {
+        model.addAttribute("slice", ticketService.getAssignedTickets(principal.getName(), page));
+        return "ticket-list/assigned";
+    
+}
 }

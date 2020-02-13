@@ -1,7 +1,11 @@
 package tadeas_musil.ticketing_system.service;
 
+import java.util.List;
+
 import javax.mail.MessagingException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import tadeas_musil.ticketing_system.entity.Department;
@@ -26,4 +30,6 @@ public interface TicketService {
     void updateStatus(Long ticketId, boolean isClosed);
 
     void createResponse(Long ticketId, String content);
+
+    Page<Ticket> getAssignedTickets(String username, int page);
 }

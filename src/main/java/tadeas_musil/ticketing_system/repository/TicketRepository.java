@@ -1,7 +1,11 @@
 package tadeas_musil.ticketing_system.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -40,4 +44,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
   @Query("SELECT COUNT(t) FROM  Ticket t WHERE t.owner =?1 AND isClosed = ?2")
   long countByOwnerAndIsClosed(String username, boolean isClosed);
+
+  Page<Ticket> findByOwner(String owner, Pageable pageable);
 }

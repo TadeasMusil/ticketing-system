@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="list(title)" class="col-md-12 admin-panel-layout__content">
+        <section class="section">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-block">
+                            <div class="card-title-block">
+                                <h3 class="title" th:text="${title}"></h3>
+                            </div>
+                            <section class="example">
+                                <div class="table-responsive ticket-table">
+                                    <table class="table table-striped table-bordered">
+                                        <thead class="thead-dark">
+                                            <tr class="font-weight-normal">
+                                                <th>ID</th>
+                                                <th>Subject</th>
+                                                <th>Priority</th>
+                                                <th>Department</th>
+                                                <th>Author</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="ticket : ${slice}" th:classappend="${ticket.closed ? 'closed-ticket' : ''}">
+                                                <td>
+                                                    <div>
+                                                        <div th:text="${'#' + ticket.id}"></div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div><a th:classappend="${ticket.closed ? 'closed-ticket' : ''}" class="ticket-table-subject" th:href="@{/ticket/{id}(id=${ticket.id})}"
+                                                            th:text="${ticket.subject}"></a></div>
+                                                </td>
+                                                <td th:switch="${ticket.priority}">
+                                                    <span
+                                                        th:case="${T(tadeas_musil.ticketing_system.entity.enums.Priority).LOW}"
+                                                        class="priority-low">Low</span>
+                                                    <span
+                                                        th:case="${T(tadeas_musil.ticketing_system.entity.enums.Priority).MEDIUM}"
+                                                        class="priority-medium">Medium</span>
+                                                    <span
+                                                        th:case="${T(tadeas_musil.ticketing_system.entity.enums.Priority).HIGH}"
+                                                        class="priority-high">High</span></td>
+                                                <td th:text="${ticket.department.name}"></td>
+                                                <td th:text="${ticket.author}"></td>
+                                                <td th:text="${#temporals.format(ticket.created, 'dd-MM-yyyy')}"></td>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>

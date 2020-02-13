@@ -3,11 +3,16 @@ package tadeas_musil.ticketing_system.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -167,5 +172,11 @@ public class TicketServiceImpl implements TicketService {
             throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
         }
 
+    }
+
+    @Override
+    public Page<Ticket> getAssignedTickets(String username, int page) {
+        Pageable pageable = PageRequest.of(page, TICKET_PAGE_SIZE, Sort.by("created").descending());
+        return ticketRepository.findByOwner(username, pageable);
     }
 }
