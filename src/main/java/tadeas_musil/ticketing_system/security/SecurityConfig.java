@@ -35,6 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity
         .authorizeRequests()
         .expressionHandler(webExpressionHandler())
+        .antMatchers("/ticket").permitAll()
         .antMatchers("/cannedResponse/**", "/user/**", "/ticket/**", "/activity/**").authenticated()
         .anyRequest()
         .permitAll()
