@@ -302,4 +302,11 @@ public class TicketControllerTest {
            .andExpect(status().isForbidden());
            
     }
+
+    @Test
+    public void showingMyTickets_shouldGetRedirected_givenUnauthorizedUser() throws Exception{
+        mockMvc.perform(get("/ticket/my-tickets") )
+           .andExpect(status().is3xxRedirection());
+           
+    }
 }

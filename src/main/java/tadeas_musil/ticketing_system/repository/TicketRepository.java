@@ -46,4 +46,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   long countByOwnerAndIsClosed(String username, boolean isClosed);
 
   Page<Ticket> findByOwner(String owner, Pageable pageable);
+
+  Page<Ticket> findByAuthor(String author, Pageable pageable);
 }

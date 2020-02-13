@@ -34,4 +34,6 @@ public interface TicketService {
     Page<Ticket> getAssignedTickets(String username, int page);
 
     Page<Ticket> getAllTickets(int page);
+
+    Page<Ticket> getByAuthor(String author, int page);
 }

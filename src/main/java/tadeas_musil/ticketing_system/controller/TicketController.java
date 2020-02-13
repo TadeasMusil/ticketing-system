@@ -142,4 +142,10 @@ public class TicketController {
         model.addAttribute("slice", ticketService.getAllTickets(page));
         return "ticket-list/all";
     }
+
+     @GetMapping("/my-tickets")
+    public String showMyTickets(Principal principal, Model model, @RequestParam(defaultValue = "0") int page) {
+        model.addAttribute("slice", ticketService.getByAuthor(principal.getName(), page));
+        return "ticket-list/my-tickets";
+    }
 }

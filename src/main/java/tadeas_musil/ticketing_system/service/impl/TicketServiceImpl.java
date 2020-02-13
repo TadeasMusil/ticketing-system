@@ -185,4 +185,10 @@ public class TicketServiceImpl implements TicketService {
         Pageable pageable = PageRequest.of(page, TICKET_PAGE_SIZE, Sort.by("created").descending());
         return ticketRepository.findAll(pageable);
     }
+
+    @Override
+    public Page<Ticket> getByAuthor(String author, int page) {
+        Pageable pageable = PageRequest.of(page, TICKET_PAGE_SIZE, Sort.by("created").descending());
+        return ticketRepository.findByAuthor(author, pageable);
+    }
 }
