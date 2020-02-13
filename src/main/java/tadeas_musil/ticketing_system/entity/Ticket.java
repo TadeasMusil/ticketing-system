@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
+import tadeas_musil.ticketing_system.validation.UniqueUsername;
 
 @Getter
 @Setter
@@ -37,7 +38,7 @@ public class Ticket {
     @NotBlank 
     private String subject;
 
-    private boolean isClosed;
+    private boolean isClosed = false;
 
     @Enumerated(EnumType.STRING)
     private Priority priority;
@@ -46,7 +47,7 @@ public class Ticket {
     @JoinColumn(name = "department_name")
     private Department department;
     
-    @NotBlank
+    @UniqueUsername
     private String author;
 
     private String owner;
@@ -89,7 +90,7 @@ public class Ticket {
         this.id = id;
     }
 
-    public Ticket(@NotBlank String owner, boolean isClosed) {
+    public Ticket(String owner, boolean isClosed) {
         this.isClosed = isClosed;
         this.owner = owner;
     }

@@ -1,5 +1,6 @@
 package tadeas_musil.ticketing_system.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -47,24 +49,30 @@ public class TicketController {
 
     @GetMapping
     public String showTicketForm(Model model) {
-        List<Department> departments = departmentService.getAllDepartments();
-        model.addAttribute("departments", departments);
+        model.addAttribute("departments", departmentService.getAllDepartments());
 
-        Ticket ticket = new Ticket();
-        ticket.addEvent(new TicketEvent());
-        model.addAttribute("ticket", ticket);
-        
+        if (!model.containsAttribute("ticket")) {
+            Ticket ticket = new Ticket();
+            ticket.addEvent(new TicketEvent());
+            model.addAttribute("ticket", ticket);
+        }
+
         return "create-ticket";
     }
 
     @PostMapping
-    public String createTicket(@Valid @ModelAttribute Ticket ticket,
-            BindingResult bindingResult) {
+    public String createTicket(@Valid @ModelAttribute Ticket ticket, BindingResult bindingResult, Principal principal,
+            RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            return "create-ticket";
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ticket", bindingResult);
+            redirectAttributes.addFlashAttribute("ticket", ticket);
+            return "redirect:/ticket";
+        }
+        if (principal != null) {
+            ticket.setAuthor(principal.getName());
         }
         Ticket createdTicket = ticketService.createTicket(ticket);
-        return "redirect:" + "/ticket/" + createdTicket.getId();
+        return "redirect:/ticket/" + createdTicket.getId();
 
     }
 
@@ -99,7 +107,7 @@ public class TicketController {
     @PatchMapping(value = "/{ticketId}/owner")
     @ResponseBody
     @PreAuthorize("hasPermission(@ticketServiceImpl.getById(#ticketId), 'edit')")
-    public void updateOwner(@PathVariable Long ticketId, @RequestBody TextNode owner) {
+    public void updateOwner(@PathVariable Long ticketId, @RequestBody(required = false) TextNode owner) {
         ticketService.updateOwner(ticketId, owner.textValue());
     }
 
@@ -118,9 +126,10 @@ public class TicketController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.response",
                     bindingResult);
             redirectAttributes.addFlashAttribute("response", response);
-            return "redirect:" + "/ticket/" + ticketId;
+        } else {
+            ticketService.createResponse(ticketId, response.getContent());
         }
-        ticketService.createResponse(ticketId, response.getContent());
         return "redirect:" + "/ticket/" + ticketId;
     }
+
 }

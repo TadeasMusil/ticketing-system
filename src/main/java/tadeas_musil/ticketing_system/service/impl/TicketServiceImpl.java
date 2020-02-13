@@ -44,6 +44,8 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketEventService ticketEventService;
 
+    public static final int TICKET_PAGE_SIZE = 10;
+
     @Value("${ticket.access_email.subject}")
     private String accessEmailSubject;
 
@@ -62,7 +64,12 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Ticket createTicket(Ticket ticket) {
-        ticket.getEvents().get(0).setType(TicketEventType.CREATE);
+        TicketEvent creationEvent = ticket.getEvents().get(0);
+        creationEvent.setType(TicketEventType.CREATE);
+        creationEvent.setAuthor(ticket.getAuthor());
+        creationEvent.setTicket(ticket);
+
+        ticket.setPriority(Priority.MEDIUM);
         return ticketRepository.save(ticket);
     }
 

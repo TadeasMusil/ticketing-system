@@ -97,13 +97,11 @@ public class TicketControllerTest {
 
     @Test
     @WithMockUser
-    public void creatingTicket_shouldShowError_givenInvalidTicket() throws Exception{
+    public void creatingTicket_shouldGetRedirected_givenInvalidTicket() throws Exception{
         mockMvc.perform(post("/ticket")
                 .flashAttr("ticket", new Ticket())
                 .with(csrf()))
-           .andExpect(status().isOk())
-           .andExpect(model().hasErrors())
-           .andExpect(view().name("create-ticket"));
+           .andExpect(status().is3xxRedirection());
     }
 
     @Test
