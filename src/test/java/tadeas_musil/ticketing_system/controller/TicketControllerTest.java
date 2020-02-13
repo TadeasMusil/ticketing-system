@@ -289,11 +289,16 @@ public class TicketControllerTest {
 
     @Test
     @WithMockUser(authorities = "USER")
-    public void showingAssignedTickets_shouldReturnForbidden_givenRegularUser() throws Exception{
+    public void showingAssignedTickets_shouldReturnForbidden_givenUnauthorizedUser() throws Exception{
+        mockMvc.perform(get("/ticket/assigned"))
+           .andExpect(status().isForbidden());
+           
+    }
 
-		
-        mockMvc.perform(get("/ticket/assigned")
-                )
+    @Test
+    @WithMockUser(authorities = "STAFF")
+    public void showingAllTickets_shouldReturnForbidden_givenUnauthorizedUser() throws Exception{
+        mockMvc.perform(get("/ticket/all") )
            .andExpect(status().isForbidden());
            
     }

@@ -32,4 +32,6 @@ public interface TicketService {
     void createResponse(Long ticketId, String content);
 
     Page<Ticket> getAssignedTickets(String username, int page);
+
+    Page<Ticket> getAllTickets(int page);
 }

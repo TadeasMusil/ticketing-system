@@ -1,10 +1,8 @@
 package tadeas_musil.ticketing_system.controller;
 
 import java.security.Principal;
-import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 
@@ -28,7 +26,6 @@ import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
-import tadeas_musil.ticketing_system.entity.enums.TicketEventType;
 import tadeas_musil.ticketing_system.service.CannedResponseService;
 import tadeas_musil.ticketing_system.service.DepartmentService;
 import tadeas_musil.ticketing_system.service.TicketService;
@@ -137,6 +134,12 @@ public class TicketController {
     public String showAssignedTickets(Principal principal, Model model, @RequestParam(defaultValue = "0") int page) {
         model.addAttribute("slice", ticketService.getAssignedTickets(principal.getName(), page));
         return "ticket-list/assigned";
-    
-}
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public String showAssignedTickets(Model model, @RequestParam(defaultValue = "0") int page) {
+        model.addAttribute("slice", ticketService.getAllTickets(page));
+        return "ticket-list/all";
+    }
 }
