@@ -121,14 +121,19 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void updateOwner(Long ticketId, String newOwnerUsername) {
         if (ticketRepository.existsById(ticketId)) {
-            User newOwner = userRepository.findByUsername(newOwnerUsername)
-                    .orElseThrow(() -> new UsernameNotFoundException(newOwnerUsername));
-
-            if (anyRoleMatch(newOwner.getRoles(), "ADMIN", "STAFF")) {
-                ticketRepository.setOwner(ticketId, newOwnerUsername);
-                ticketEventService.createEvent(ticketId, TicketEventType.OWNER_CHANGE, newOwnerUsername);
+            if (Objects.equals("", newOwnerUsername)) {
+                ticketRepository.setOwner(ticketId, null);
+                ticketEventService.createEvent(ticketId, TicketEventType.OWNER_CHANGE, null);
             } else {
-                throw new IllegalArgumentException("Can not assign ticket to " + newOwnerUsername);
+                User newOwner = userRepository.findByUsername(newOwnerUsername)
+                        .orElseThrow(() -> new UsernameNotFoundException(newOwnerUsername));
+
+                if (anyRoleMatch(newOwner.getRoles(), "ADMIN", "STAFF")) {
+                    ticketRepository.setOwner(ticketId, newOwnerUsername);
+                    ticketEventService.createEvent(ticketId, TicketEventType.OWNER_CHANGE, newOwnerUsername);
+                } else {
+                    throw new IllegalArgumentException("Can not assign ticket to " + newOwnerUsername);
+                }
             }
 
         } else {

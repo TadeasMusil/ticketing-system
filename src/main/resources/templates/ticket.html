@@ -32,7 +32,7 @@
                             </select>
                         </div>
                         <!--    Author   -->
-                        <span class="col-sm-3" th:text="${ticket.author}"></span>
+                        <span id="author" class="col-sm-3" th:text="${ticket.author}"></span>
 
                         <!--    Priority   -->
                         <div class="col-sm-3">
@@ -66,6 +66,7 @@
                         <!--    Owner   -->
                         <div class="col-sm-3">
                             <select id="owner" class="rounded-pill c-select form-control boxed ticket-dropdown">
+                                <option th:selected="${ticket.owner} == ''">Unassigned</option>
                                 <option th:each="staffMember : ${staffMembers}" th:text="${staffMember.username}"
                                     th:selected="${ticket.owner} == ${staffMember.username}">
                             </select>
@@ -119,21 +120,31 @@
                 <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).OWNER_CHANGE}">
                     <i class="fas fa-user ticket-event-icon mr-3"></i>
                     <b th:text="${event.author}"></b>
-                    <span> assigned ticket to </span>
+                   <th:block th:if="${event.content == null}"> <span> unassigned ticket </span>
+                </th:block>
+                <th:block th:unless="${event.content == null}"> <span> assigned ticket to </span>
                     <b th:text="${event.content}"></b>
+                </th:block>
                     <span> on </span>
                     <span th:text="${#temporals.format(event.created, 'dd-MM-yyyy HH:mm:ss')}"></span>
                 </div>
-                <!--    Type 'STATUS_CHANGE'   -->
-                <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).STATUS_CHANGE}">
+                <!--    Type 'CLOSE'   -->
+                <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).CLOSE}">
                     <i class="fas fa-lock ticket-event-icon mr-3"></i>
                     <b th:text="${event.author}"></b>
-                    <span th:if="${event.content == 'CLOSED'}"> closed ticket </span>
-                    <span th:if="${event.content == 'OPENED'}"> reopened ticket </span>
+                    <span> closed ticket </span>
                     <span> on </span>
                     <span th:text="${#temporals.format(event.created, 'dd-MM-yyyy HH:mm:ss')}"></span>
                 </div>
-                <!--    Type 'STATUS_CHANGE'   -->
+                <!--    Type 'REOPEN'   -->
+                <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).REOPEN}">
+                    <i class="fas fa-lock-open ticket-event-icon mr-3"></i>
+                    <b th:text="${event.author}"></b>
+                    <span> reopened ticket </span>
+                    <span> on </span>
+                    <span th:text="${#temporals.format(event.created, 'dd-MM-yyyy HH:mm:ss')}"></span>
+                </div>
+                <!--    Type 'PRIORITY_CHANGE'   -->
                 <div th:case="${T(tadeas_musil.ticketing_system.entity.enums.TicketEventType).PRIORITY_CHANGE}">
                     <i class="fas fa-list-ul ticket-event-icon mr-3"></i>
                     <b th:text="${event.author}"></b>
@@ -216,14 +227,14 @@
             $("#status").change(
                 function () {
                     var id = $(this).attr("id");
-                    var isClosed = this.value == "CLOSED";
+                    var isClosed = this.value;
                     updateTicket(isClosed, id);
                 }
             );
             $("#owner, #priority").change(
                 function () {
                     var id = $(this).attr("id");
-                    var val = this.value;
+                    var val = this.value == 'Unassigned' ? '' : this.value;
                     updateTicket(val, id);
                 }
             );
@@ -262,7 +273,7 @@
                 var header = $("meta[name='_csrf_header']").attr("content");
                 $(document).ajaxSend(function (e, xhr, options) {
                     xhr.setRequestHeader(header, token);
-                }); 
+                });
             });
         </script>
 
