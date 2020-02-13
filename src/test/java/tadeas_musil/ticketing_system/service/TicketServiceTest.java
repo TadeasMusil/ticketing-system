@@ -213,7 +213,7 @@ public class TicketServiceTest {
     ticketService.updateStatus(ticketId, true);
 
     verify(ticketRepository).setIsClosed(ticketId, true);
-    verify(ticketEventService).createEvent(ticketId, TicketEventType.STATUS_CHANGE, "CLOSED");
+    verify(ticketEventService).createEvent(ticketId, TicketEventType.CLOSE, "CLOSED");
   }
 
    @Test
@@ -224,7 +224,7 @@ public class TicketServiceTest {
     ticketService.updateStatus(ticketId, false);
 
     verify(ticketRepository).setIsClosed(ticketId, false);
-    verify(ticketEventService).createEvent(ticketId, TicketEventType.STATUS_CHANGE, "OPEN");
+    verify(ticketEventService).createEvent(ticketId, TicketEventType.REOPEN, "OPEN");
   }
 
   @Test
