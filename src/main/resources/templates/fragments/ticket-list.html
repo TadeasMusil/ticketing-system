@@ -19,21 +19,33 @@
                                             <tr class="font-weight-normal">
                                                 <th>ID</th>
                                                 <th>Subject</th>
-                                                <th>Priority</th>
-                                                <th>Department</th>
+                                                <th><select id="priority" class="ticket-list-select">
+                                                        <option selected>Priority</option>
+                                                        <option
+                                                            th:each="priority : ${T(tadeas_musil.ticketing_system.entity.enums.Priority).values()}"
+                                                            th:value="${priority}" th:text="${priority}">
+                                                    </select></th>
+                                                <th><select id="department" class="ticket-list-select">
+                                                        <option selected>Department</option>
+                                                        <option th:each="department : ${departments}"
+                                                            th:value="${department.name}" th:text="${department.name}">
+                                                    </select></th>
                                                 <th>Author</th>
                                                 <th>Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="ticket : ${slice}" th:classappend="${ticket.closed ? 'closed-ticket' : ''}">
+                                            <tr th:each="ticket : ${slice}"
+                                                th:classappend="${ticket.closed ? 'closed-ticket' : ''}">
                                                 <td>
                                                     <div>
                                                         <div th:text="${'#' + ticket.id}"></div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div><a th:classappend="${ticket.closed ? 'closed-ticket' : ''}" class="ticket-table-subject" th:href="@{/ticket/{id}(id=${ticket.id})}"
+                                                    <div><a th:classappend="${ticket.closed ? 'closed-ticket' : ''}"
+                                                            class="ticket-table-subject"
+                                                            th:href="@{/ticket/{id}(id=${ticket.id})}"
                                                             th:text="${ticket.subject}"></a></div>
                                                 </td>
                                                 <td th:switch="${ticket.priority}">
@@ -58,7 +70,26 @@
                 </div>
             </div>
         </section>
-    </div>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+            <script>
+                $("#priority, #department").change(
+                    function () {
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var key = $(this).attr("id");
+                        if (urlParams.has(key)) {
+                            urlParams.set(key, this.value);
+                        }
+                        else {
+                            urlParams.append(key, this.value);
+                        }
+                        window.location = window.location.href;
+                        window.location.search = urlParams;
+
+                    }
+                );
+            </script>
+        </div>
 </body>
 
 </html>

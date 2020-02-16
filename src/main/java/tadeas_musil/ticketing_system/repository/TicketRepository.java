@@ -1,23 +1,24 @@
 package tadeas_musil.ticketing_system.repository;
 
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import tadeas_musil.ticketing_system.entity.Department;
+import tadeas_musil.ticketing_system.entity.QTicket;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @Repository
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends JpaRepository<Ticket, Long>,QuerydslPredicateExecutor<Ticket>, QuerydslBinderCustomizer<QTicket>, JpaSpecificationExecutor<Ticket>{
   
   @Query("SELECT t FROM Ticket t LEFT JOIN FETCH t.events WHERE t.id = ?1")
   Optional<Ticket> findByIdAndFetchEvents(Long id);
@@ -45,7 +46,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   @Query("SELECT COUNT(t) FROM  Ticket t WHERE t.owner =?1 AND isClosed = ?2")
   long countByOwnerAndIsClosed(String username, boolean isClosed);
 
-  Page<Ticket> findByOwner(String owner, Pageable pageable);
-
-  Page<Ticket> findByAuthor(String author, Pageable pageable);
+  @Override
+  default void customize(QuerydslBindings bindings, QTicket root) {
+  }
 }

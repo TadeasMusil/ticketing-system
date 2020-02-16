@@ -8,16 +8,21 @@ import java.util.Set;
 
 import javax.mail.MessagingException;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
+import tadeas_musil.ticketing_system.entity.QTicket;
 import tadeas_musil.ticketing_system.entity.Role;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
@@ -175,20 +180,24 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Page<Ticket> getAssignedTickets(String username, int page) {
+    public Page<Ticket> getAssignedTickets(String username, Predicate predicate, int page) {
         Pageable pageable = PageRequest.of(page, TICKET_PAGE_SIZE, Sort.by("created").descending());
-        return ticketRepository.findByOwner(username, pageable);
+        BooleanBuilder builder = new BooleanBuilder(predicate);
+        builder.and(QTicket.ticket.owner.eq(username));
+        return ticketRepository.findAll(predicate, pageable);
     }
 
     @Override
-    public Page<Ticket> getAllTickets(int page) {
+    public Page<Ticket> getAllByAuthor(String username, Predicate predicate, int page) {
         Pageable pageable = PageRequest.of(page, TICKET_PAGE_SIZE, Sort.by("created").descending());
-        return ticketRepository.findAll(pageable);
+        BooleanBuilder builder = new BooleanBuilder(predicate);
+        builder.and(QTicket.ticket.author.eq(username));
+        return ticketRepository.findAll(predicate, pageable);
     }
-
     @Override
-    public Page<Ticket> getByAuthor(String author, int page) {
+    public Page<Ticket> getAll(Predicate predicate, int page) {
         Pageable pageable = PageRequest.of(page, TICKET_PAGE_SIZE, Sort.by("created").descending());
-        return ticketRepository.findByAuthor(author, pageable);
+        return ticketRepository.findAll(predicate, pageable);
     }
+    
 }

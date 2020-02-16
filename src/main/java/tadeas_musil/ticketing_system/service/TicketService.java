@@ -1,11 +1,11 @@
 package tadeas_musil.ticketing_system.service;
 
-import java.util.List;
-
 import javax.mail.MessagingException;
 
+import com.querydsl.core.types.Predicate;
+
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import tadeas_musil.ticketing_system.entity.Department;
@@ -31,9 +31,9 @@ public interface TicketService {
 
     void createResponse(Long ticketId, String content);
 
-    Page<Ticket> getAssignedTickets(String username, int page);
+    Page<Ticket> getAssignedTickets(String username, Predicate predicate, int page);
 
-    Page<Ticket> getAllTickets(int page);
+    Page<Ticket> getAll(Predicate predicate, int page);
 
-    Page<Ticket> getByAuthor(String author, int page);
+    Page<Ticket> getAllByAuthor(String username, Predicate predicate, int page);
 }
