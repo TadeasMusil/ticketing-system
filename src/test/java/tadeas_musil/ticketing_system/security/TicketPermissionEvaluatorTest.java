@@ -37,47 +37,6 @@ public class TicketPermissionEvaluatorTest {
     }
 
     @Test
-    @WithMockUser
-    public void hasPermission_shouldReturnFalse_givenNullPermission() {
-        Ticket ticket = new Ticket();
-
-        boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, null);
-
-        assertThat(hasPermission).isFalse();
-    }
-
-    @Test
-    @WithMockUser
-    public void hasPermission_shouldReturnFalse_givenNullTicket() {
-
-        boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), null, "read");
-
-        assertThat(hasPermission).isFalse();
-    }
-
-    @Test
-   
-    public void hasPermission_shouldReturnFalse_givenAnonymousUser() {
-        Ticket ticket = new Ticket();
-
-        boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), ticket, "read");
-
-        assertThat(hasPermission).isFalse();
-    }
-
-    @Test
-    @WithMockUser
-    public void hasPermission_shouldReturnFalse_givenStringInsteadOfTicket() {
-        boolean hasPermission = ticketPermissionEvaluator
-                .hasPermission(SecurityContextHolder.getContext().getAuthentication(), "string", "read");
-
-        assertThat(hasPermission).isFalse();
-    }
-
-    @Test
     @WithMockUser(authorities = "ADMIN")
     public void hasPermission_shouldReturnTrue_givenPermissionReadAndRoleAdmin() {
         Ticket ticket = new Ticket();

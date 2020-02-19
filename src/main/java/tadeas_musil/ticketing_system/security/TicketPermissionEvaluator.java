@@ -1,10 +1,8 @@
 package tadeas_musil.ticketing_system.security;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
-import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -12,11 +10,12 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
+import tadeas_musil.ticketing_system.security.permission.TargetPermissionEvaluator;
 import tadeas_musil.ticketing_system.service.DepartmentService;
 
 @RequiredArgsConstructor
 @Component
-public class TicketPermissionEvaluator implements PermissionEvaluator {
+public class TicketPermissionEvaluator implements TargetPermissionEvaluator {
 
     private final DepartmentService departmentService;
 
@@ -24,9 +23,6 @@ public class TicketPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        if ((authentication == null) || !(targetDomainObject instanceof Ticket) || !(permission instanceof String)) {
-            return false;
-        }
         this.authentication = authentication;
         Ticket ticket = (Ticket) targetDomainObject;
         if (userHasRole("ADMIN")) {
@@ -74,6 +70,11 @@ public class TicketPermissionEvaluator implements PermissionEvaluator {
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
             Object permission) {
         throw new UnsupportedOperationException("Unsupported hasPermission");
+    }
+
+    @Override
+    public Class getTargetClass() {
+        return Ticket.class;
     }
 
 }
