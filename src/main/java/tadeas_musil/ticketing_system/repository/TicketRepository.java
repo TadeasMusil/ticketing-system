@@ -2,8 +2,9 @@ package tadeas_musil.ticketing_system.repository;
 
 import java.util.Optional;
 
+import com.querydsl.core.types.dsl.StringExpression;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -18,7 +19,7 @@ import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 
 @Repository
-public interface TicketRepository extends JpaRepository<Ticket, Long>,QuerydslPredicateExecutor<Ticket>, QuerydslBinderCustomizer<QTicket>, JpaSpecificationExecutor<Ticket>{
+public interface TicketRepository extends JpaRepository<Ticket, Long>,QuerydslPredicateExecutor<Ticket>, QuerydslBinderCustomizer<QTicket> {
   
   @Query("SELECT t FROM Ticket t LEFT JOIN FETCH t.events WHERE t.id = ?1")
   Optional<Ticket> findByIdAndFetchEvents(Long id);
@@ -47,6 +48,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>,QuerydslPr
   long countByOwnerAndIsClosed(String username, boolean isClosed);
 
   @Override
-  default void customize(QuerydslBindings bindings, QTicket root) {
+  default void customize(QuerydslBindings bindings, QTicket ticket) {
+    bindings.including(
+      ticket.author,
+      ticket.created,
+      ticket.department,
+      ticket.owner,
+      ticket.priority);
+    bindings.excludeUnlistedProperties(true);
   }
 }

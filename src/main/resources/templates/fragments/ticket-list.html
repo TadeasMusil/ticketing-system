@@ -20,13 +20,13 @@
                                                 <th>ID</th>
                                                 <th>Subject</th>
                                                 <th><select id="priority" class="ticket-list-select">
-                                                        <option selected>Priority</option>
+                                                        <option value="Priority" selected>Priority</option>
                                                         <option
                                                             th:each="priority : ${T(tadeas_musil.ticketing_system.entity.enums.Priority).values()}"
                                                             th:value="${priority}" th:text="${priority}">
                                                     </select></th>
                                                 <th><select id="department" class="ticket-list-select">
-                                                        <option selected>Department</option>
+                                                        <option value="Department" selected>Department</option>
                                                         <option th:each="department : ${departments}"
                                                             th:value="${department.name}" th:text="${department.name}">
                                                     </select></th>
@@ -48,7 +48,7 @@
                                                             th:href="@{/ticket/{id}(id=${ticket.id})}"
                                                             th:text="${ticket.subject}"></a></div>
                                                 </td>
-                                                <td th:switch="${ticket.priority}">
+                                                <td class="text-center" th:switch="${ticket.priority}">
                                                     <span
                                                         th:case="${T(tadeas_musil.ticketing_system.entity.enums.Priority).LOW}"
                                                         class="priority-low">Low</span>
@@ -69,25 +69,55 @@
                     </div>
                 </div>
             </div>
+            <ul th:replace="~{fragments/pagination :: pagination(${slice})}"></ul>
         </section>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
             <script>
-                $("#priority, #department").change(
-                    function () {
-                        var urlParams = new URLSearchParams(window.location.search);
-                        var key = $(this).attr("id");
-                        if (urlParams.has(key)) {
-                            urlParams.set(key, this.value);
-                        }
-                        else {
-                            urlParams.append(key, this.value);
-                        }
-                        window.location = window.location.href;
-                        window.location.search = urlParams;
-
+                $("#priority, #department").change(function () {
+                    var key = $(this).attr("id");
+                    var value = this.value;
+                    var urlParams = new URLSearchParams(window.location.search);
+                    if (value == "Priority" || value == "Department") {
+                        urlParams.delete(key);
                     }
+                    else if (urlParams.has(key)) {
+                        urlParams.set(key, this.value);
+                    }
+                    else {
+                        urlParams.append(key, this.value);
+                    }
+                    window.location.search = urlParams.toString();
+                }
                 );
+                document.addEventListener('DOMContentLoaded', function () {
+
+                    var urlParams = new URLSearchParams(window.location.search);
+
+                    for (const [key, value] of urlParams) {
+
+                        switch (key) {
+                            case 'department':
+                                $("#department > option").each(function () {
+                                    if (value == this.value) {
+                                        $(this).prop('selected', true);
+                                        this.textContent = 'Department: ' + this.value;
+                                    }
+                                })
+                                break;
+
+                            case 'priority':
+                                $("#priority > option").each(function () {
+                                    if (value == this.value) {
+                                        $(this).prop('selected', true);
+                                        this.textContent = 'Priority: ' + this.value;
+                                    }
+                                });
+                                break;
+                        }
+                    }
+                }, false);
+
             </script>
         </div>
 </body>

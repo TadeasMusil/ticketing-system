@@ -5,7 +5,6 @@ import java.security.Principal;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
@@ -29,11 +28,11 @@ import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
+import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.service.CannedResponseService;
 import tadeas_musil.ticketing_system.service.DepartmentService;
 import tadeas_musil.ticketing_system.service.TicketService;
 import tadeas_musil.ticketing_system.service.UserService;
-import tadeas_musil.ticketing_system.entity.QTicket;
 
 @Controller
 @RequiredArgsConstructor
@@ -152,7 +151,7 @@ public class TicketController {
 
     @GetMapping("/my-tickets")
     public String showMyTickets(Principal principal, Model model, @RequestParam(defaultValue = "0") int page,
-            @QuerydslPredicate(root = Ticket.class) Predicate predicate) {
+            @QuerydslPredicate(root = Ticket.class, bindings = TicketRepository.class) Predicate predicate) {
 
         model.addAttribute("slice", ticketService.getAllByAuthor(principal.getName(), predicate, page));
         model.addAttribute("departments", departmentService.getAllDepartments());

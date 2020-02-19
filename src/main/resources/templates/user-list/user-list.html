@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+
+<body>
+    <article class="content dashboard-page" layout:fragment="~{content}">
+        <form th:action="@{/user/search}" method="GET" id="searchButton">
+            <div class="form-group row  ml-0">
+                <label class="col-sm-2 form-control-label text-xs-right"> Search Users: </label>
+
+                <div class="col-sm-6">
+                    <input type="text" name="query" class="form-control" id="search-input">
+
+                </div>
+                <button type="submit" class="btn btn-primary rounded mr-5"> Search
+                </button>
+            </div>
+        </form>
+        <div th:replace="~{fragments/user-list :: list('Users')}"></div>
+    </article>
+</body>
+
+
+</html>

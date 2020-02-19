@@ -1,5 +1,6 @@
 package tadeas_musil.ticketing_system.security;
 
+import java.security.AccessControlException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,15 +26,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                                    .orElseThrow(() -> new UsernameNotFoundException(username));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        if (user.isDisabled()) {
+            throw new AccessControlException("User: " + username + " is disabled");
+        }
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
                 getAuthorities(user));
     }
 
-    private Set<GrantedAuthority> getAuthorities(User user){
+    private Set<GrantedAuthority> getAuthorities(User user) {
         Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-        for(Role role : user.getRoles()) {
+        for (Role role : user.getRoles()) {
             GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getName());
             authorities.add(grantedAuthority);
         }

@@ -68,6 +68,8 @@ public class User {
 
     @Transient
     private String passwordConfirmation;
+
+    private boolean isDisabled = false;
                     
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "app_user_role",
