@@ -7,17 +7,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import tadeas_musil.ticketing_system.entity.QUser;
 import tadeas_musil.ticketing_system.entity.User;
 
 @Repository
 public interface UserRepository
-    extends JpaRepository<User, Long>, QuerydslPredicateExecutor<User>, QuerydslBinderCustomizer<QUser> {
+    extends JpaRepository<User, Long>, QuerydslPredicateExecutor<User> {
 
   Optional<User> findByUsername(String username);
 
@@ -37,14 +34,4 @@ public interface UserRepository
 
 	@Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.id = :id")
   Optional<User> findByIdAndFetchRoles(Long id);
-
-  @Override
-  default void customize(QuerydslBindings bindings, QUser user) {
-    bindings.including(
-      user.departments,
-      user.isDisabled,
-      user.username
-      );
-    bindings.excludeUnlistedProperties(true);
-  }
 }
