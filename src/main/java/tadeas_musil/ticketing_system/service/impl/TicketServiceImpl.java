@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.mail.MessagingException;
 
@@ -16,14 +15,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.QTicket;
-import tadeas_musil.ticketing_system.entity.Role;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.TicketEvent;
 import tadeas_musil.ticketing_system.entity.TicketToken;
@@ -91,16 +89,11 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public void updatePriority(Long ticketId, Priority priority) {
-        if (ticketRepository.existsById(ticketId)) {
-            if (isValid(priority)) {
-                ticketRepository.setPriority(ticketId, priority);
-                ticketEventService.createEvent(ticketId, TicketEventType.PRIORITY_CHANGE, priority.name());
-            } else {
-                throw new IllegalArgumentException("Invalid priority: " + priority.name());
-            }
-        } else {
-            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
-        }
+        Assert.isTrue(ticketRepository.existsById(ticketId), "Ticket " + ticketId + " does not exist.");
+        Assert.isTrue(isValid(priority), "Invalid priority: " + priority.name());
+
+        ticketRepository.setPriority(ticketId, priority);
+        ticketEventService.createEvent(ticketId, TicketEventType.PRIORITY_CHANGE, priority.name());
     }
 
     private boolean isValid(Priority priority) {
@@ -114,69 +107,55 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public void updateDepartment(Long ticketId, Department department) {
-        if (ticketRepository.existsById(ticketId)) {
-            if (departmentRepository.existsById(department.getName())) {
-                ticketRepository.setDepartment(ticketId, department);
-                ticketEventService.createEvent(ticketId, TicketEventType.DEPARTMENT_CHANGE, department.getName());
-            } else {
-                throw new IllegalArgumentException("Invalid department: " + department.getName());
-            }
+        Assert.isTrue(ticketRepository.existsById(ticketId), "Ticket " + ticketId + " does not exist.");
+        Assert.isTrue(departmentRepository.existsById(department.getName()), "Department " + department.getName() + " does not exist.");
 
-        } else {
-            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
-        }
-
+        ticketRepository.setDepartment(ticketId, department);
+        ticketEventService.createEvent(ticketId, TicketEventType.DEPARTMENT_CHANGE, department.getName());
     }
 
     @Override
     public void updateOwner(Long ticketId, String newOwnerUsername) {
-        if (ticketRepository.existsById(ticketId)) {
-            if (Objects.equals("", newOwnerUsername)) {
-                ticketRepository.setOwner(ticketId, null);
-                ticketEventService.createEvent(ticketId, TicketEventType.OWNER_CHANGE, null);
-            } else {
-                User newOwner = userRepository.findByUsername(newOwnerUsername)
-                        .orElseThrow(() -> new UsernameNotFoundException(newOwnerUsername));
+        Assert.isTrue(ticketRepository.existsById(ticketId), "Ticket " + ticketId + " does not exist.");
 
-                if (anyRoleMatch(newOwner.getRoles(), "ADMIN", "STAFF")) {
-                    ticketRepository.setOwner(ticketId, newOwnerUsername);
-                    ticketEventService.createEvent(ticketId, TicketEventType.OWNER_CHANGE, newOwnerUsername);
-                } else {
-                    throw new IllegalArgumentException("Can not assign ticket to " + newOwnerUsername);
-                }
-            }
-
+        if (Objects.equals("", newOwnerUsername)) {
+            ticketRepository.setOwner(ticketId, null);
+            ticketEventService.createEvent(ticketId, TicketEventType.OWNER_CHANGE, null);
         } else {
-            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
+            User newOwner = userRepository.findByUsername(newOwnerUsername)
+                    .orElseThrow(() -> new UsernameNotFoundException(newOwnerUsername));
+
+            Assert.isTrue(isStaffMember(newOwner), "Can not assign ticket to " + newOwnerUsername);
+
+            ticketRepository.setOwner(ticketId, newOwnerUsername);
+            ticketEventService.createEvent(ticketId, TicketEventType.OWNER_CHANGE, newOwnerUsername);
+
         }
+
     }
 
-    private boolean anyRoleMatch(Set<Role> roles, String... stringRoles) {
-        return roles.stream().map(r -> r.getName()).anyMatch(Set.of(stringRoles)::contains);
+    private boolean isStaffMember(User user) {
+        return user.getRoles().stream().map(r -> r.getName())
+                .anyMatch(role -> role.equals("ADMIN") || role.equals("STAFF"));
     }
 
     @Override
     public void updateStatus(Long ticketId, boolean isClosed) {
-        if (ticketRepository.existsById(ticketId)) {
-            ticketRepository.setIsClosed(ticketId, isClosed);
-            if (isClosed) {
-                ticketEventService.createEvent(ticketId, TicketEventType.CLOSE, "CLOSED");
-            } else {
-                ticketEventService.createEvent(ticketId, TicketEventType.REOPEN, "OPEN");
-            }
+        Assert.isTrue(ticketRepository.existsById(ticketId), "Ticket " + ticketId + " does not exist.");
+
+        ticketRepository.setIsClosed(ticketId, isClosed);
+        if (isClosed) {
+            ticketEventService.createEvent(ticketId, TicketEventType.CLOSE, "CLOSED");
         } else {
-            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
+            ticketEventService.createEvent(ticketId, TicketEventType.REOPEN, "OPEN");
         }
     }
 
     @Override
     public void createResponse(Long ticketId, String content) {
-        if (ticketRepository.existsById(ticketId)) {
-            ticketEventService.createEvent(ticketId, TicketEventType.RESPONSE, content);
-        } else {
-            throw new IllegalArgumentException("Ticket " + ticketId + " does not exist.");
-        }
+        Assert.isTrue(ticketRepository.existsById(ticketId), "Ticket " + ticketId + " does not exist.");
 
+        ticketEventService.createEvent(ticketId, TicketEventType.RESPONSE, content);
     }
 
     @Override
@@ -194,10 +173,11 @@ public class TicketServiceImpl implements TicketService {
         builder.and(QTicket.ticket.author.eq(username));
         return ticketRepository.findAll(predicate, pageable);
     }
+
     @Override
     public Page<Ticket> getAll(Predicate predicate, int page) {
         Pageable pageable = PageRequest.of(page, TICKET_PAGE_SIZE, Sort.by("created").descending());
         return ticketRepository.findAll(predicate, pageable);
     }
-    
+
 }
