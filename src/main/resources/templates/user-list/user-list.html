@@ -3,12 +3,12 @@
 
 <body>
     <article class="content dashboard-page" layout:fragment="~{content}">
-        <form th:action="@{/user/search}" method="GET" id="searchButton">
+        <form th:action="@{/user}" method="GET" id="searchButton">
             <div class="form-group row  ml-0">
                 <label class="col-sm-2 form-control-label text-xs-right"> Search Users: </label>
 
                 <div class="col-sm-6">
-                    <input type="text" name="query" class="form-control" id="search-input">
+                    <input type="text" name="search" class="form-control" id="search-input">
 
                 </div>
                 <button type="submit" class="btn btn-primary rounded mr-5"> Search

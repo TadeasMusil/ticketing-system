@@ -6,13 +6,14 @@ import java.util.NoSuchElementException;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import tadeas_musil.ticketing_system.entity.QUser;
 import tadeas_musil.ticketing_system.entity.User;
@@ -20,7 +21,7 @@ import tadeas_musil.ticketing_system.repository.RoleRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
 import tadeas_musil.ticketing_system.service.UserService;
 
-@Service("userServiceImpl")
+@Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -44,27 +45,25 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAllByRoleInAndOrderByUsername("ADMIN", "STAFF");
     }
 
+    @Transactional
     @Override
-    public Page<User> getAll(String searchQuery, Predicate predicate, int page) {
-        Pageable pageable = PageRequest.of(page, 8, Sort.by("username").ascending());
+    public Page<User> getAllByRole(String role, Predicate predicate, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder(predicate);
-        if (searchQuery != null) {
-            builder.and(QUser.user.username.likeIgnoreCase("%" + searchQuery + "%")
-                    .or(QUser.user.firstName.likeIgnoreCase("%" + searchQuery + "%"))
-                    .or(QUser.user.lastName.likeIgnoreCase("%" + searchQuery + "%")));
+        builder.and(QUser.user.roles.any().name.equalsIgnoreCase(role));
+
+        Page<User> page = userRepository.findAll(builder, pageable);
+        if (!page.getContent().isEmpty()) {
+            Hibernate.initialize(page.getContent().get(0).getDepartments());
         }
-        return userRepository.findAll(builder, pageable);
+        return page;
     }
 
     @Override
     public void updateAccountStatus(Long id, boolean isDisabled) {
-        if (userRepository.existsById(id)) {
-            userRepository.setIsDisabled(id, isDisabled);
-        } else {
-            throw new IllegalArgumentException("User with ID: " + id + " does not exist.");
-        }
+        Assert.isTrue(userRepository.existsById(id), "User with ID: " + id + " does not exist.");
+        userRepository.setIsDisabled(id, isDisabled);
     }
-   
+
     @Override
     public User getById(Long id) {
         return userRepository.findByIdAndFetchRoles(id)

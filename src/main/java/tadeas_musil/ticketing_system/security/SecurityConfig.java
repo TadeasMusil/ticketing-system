@@ -37,14 +37,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .expressionHandler(webExpressionHandler())
         .antMatchers("/ticket").permitAll()
         .antMatchers("/user/**").hasAnyAuthority("STAFF", "ADMIN")
+        .antMatchers("/staff/**").hasAuthority("ADMIN")
         .antMatchers("/cannedResponse/**", "/ticket/**", "/activity/**").authenticated()
         .anyRequest()
         .permitAll()
-            .and().logout().and()
+        .and()
         .formLogin()
             .loginPage("/login")
             .defaultSuccessUrl("/")
-            ;
+        .and()
+        .logout();
     }
 
     @Bean

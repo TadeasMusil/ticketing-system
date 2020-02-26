@@ -5,6 +5,7 @@ import java.util.List;
 import com.querydsl.core.types.Predicate;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import tadeas_musil.ticketing_system.entity.User;
@@ -16,7 +17,7 @@ public interface UserService {
 
     List<User> getAllStaffMembers();
 
-    Page<User> getAll(String searchQuery, Predicate predicate, int page);
+    Page<User> getAllByRole(String role, Predicate predicate, Pageable pageable);
 
     void updateAccountStatus(Long id, boolean isDisabled);
 

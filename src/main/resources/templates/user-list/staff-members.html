@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" layout:decorate="~{layout}">
+
+<body>
+    <article class="content dashboard-page" layout:fragment="~{content}">
+        <!--Search bar-->
+        <form th:action="@{/staff?search={search}(search=)}" method="GET" id="searchButton">
+            <div class="form-group row  ml-0">
+                <label class="col-sm-2 form-control-label text-xs-right"> Search Staff: </label>
+
+                <div class="col-sm-6">
+                    <input type="text" name="search" class="form-control" id="search-input">
+
+                </div>
+                <button type="submit" class="btn btn-primary rounded mr-5"> Search
+                </button>
+            </div>
+        </form>
+        <div class="col-md-12 admin-panel-layout__content">
+            <section class="section">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-block">
+                                <div class="card-title-block">
+                                    <h3 class="title" th:text="${title}"></h3>
+                                </div>
+                                <section class="example">
+                                    <div class="table-responsive ticket-table">
+                                        <table class="table table-striped table-bordered">
+                                            <thead class="thead-dark">
+                                                <tr class="font-weight-normal">
+                                                    <th>ID</th>
+                                                    <th>First Name</th>
+                                                    <th>Last Name</th>
+                                                    <th>Username</th>
+                                                    <th><select id="department" class="ticket-list-select">
+                                                            <option value="Department" selected>Department</option>
+                                                            <option th:each="department : ${departments}"
+                                                                th:value="${department.name}"
+                                                                th:text="${department.name}">
+                                                        </select></th>
+                                                    <th class="text-center"><select id="isDisabled"
+                                                            class="text-center ticket-list-select">
+                                                            <option value="isDisabled">Account Status</option>
+                                                            <option th:value="${false}">Active</option>
+                                                            <option th:value="${true}">Banned</option>
+                                                        </select></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="currentUser : ${page}"
+                                                    th:classappend="${currentUser.disabled ? 'closed-user' : ''}">
+                                                    <td th:text="${'#' + currentUser.id}">
+
+                                                    </td>
+                                                    <td th:text="${currentUser.firstName}">
+
+                                                    </td>
+                                                    <td th:text="${currentUser.lastName}">
+                                                    </td>
+                                                    <td th:text="${currentUser.username}"></td>
+                                                    <td>
+                                                        <div th:each="department  : ${currentUser.departments}"
+                                                            th:text="${department.name}">
+
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <form th:action="@{/user/{id}(id=${currentUser.id})}"
+                                                            method="POST">
+                                                            <input type="hidden" th:value="${!currentUser.disabled}"
+                                                                name="disabled">
+                                                            <input type="hidden" th:value="${currentUser.id}" name="id">
+                                                            <div th:if="${currentUser.disabled}"> <button type="submit"
+                                                                    class="btn btn-primary rounded"> Enable User
+                                                                </button></div>
+                                                            <div th:unless="${currentUser.disabled}">
+
+                                                                <button type="submit" id="delete-button"
+                                                                    class="btn btn-danger rounded"> Disable User
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ul th:replace="~{fragments/pagination :: pagination(${page})}"></ul>
+            </section>
+            <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+                integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+            <script>
+                $("#isDisabled").change(function () {
+                    var key = $(this).attr("id");
+                    var value = this.value;
+                    var urlParams = new URLSearchParams(window.location.search);
+                    if (value == "isDisabled") {
+                        urlParams.delete(key);
+                    }
+                    else if (urlParams.has(key)) {
+                        urlParams.set(key, this.value);
+                    }
+                    else {
+                        urlParams.append(key, this.value);
+                    }
+                    window.location.search = urlParams.toString();
+                }
+                );
+                document.addEventListener('DOMContentLoaded', function () {
+
+                    var urlParams = new URLSearchParams(window.location.search);
+
+                    for (const [key, value] of urlParams) {
+
+                        switch (key) {
+                            case 'isDisabled':
+                                $("#isDisabled > option").each(function () {
+                                    if (value == this.value) {
+                                        $(this).prop('selected', true);
+                                        this.textContent = 'Account Status: ' + this.textContent;
+                                    }
+                                })
+                                break;
+                        }
+                    }
+                }, false);
+
+            </script>
+        </div>
+    </article>
+</body>
+
+</html>
