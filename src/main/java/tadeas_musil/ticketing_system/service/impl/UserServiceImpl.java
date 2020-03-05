@@ -40,11 +40,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    @Override
-    public List<User> getAllStaffMembers() {
-        return userRepository.findAllByRoleInAndOrderByUsername("ADMIN", "STAFF");
-    }
-
     @Transactional
     @Override
     public Page<User> getAllByRole(String role, Predicate predicate, Pageable pageable) {
@@ -66,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(Long id) {
-        return userRepository.findByIdAndFetchRoles(id)
+        return userRepository.findByIdAndFetchRolesAndDepartments(id)
                 .orElseThrow(() -> new NoSuchElementException("User with ID: " + id + " doesn't exist"));
     }
 }

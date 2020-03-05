@@ -51,8 +51,8 @@
                                             <tbody>
                                                 <tr th:each="currentUser : ${page}"
                                                     th:classappend="${currentUser.disabled ? 'closed-user' : ''}">
-                                                    <td th:text="${'#' + currentUser.id}">
-
+                                                    <td >
+                                                            <a th:text="${'#' + currentUser.id}" th:href="@{/staff/{id}(id=${currentUser.id})}"></a>
                                                     </td>
                                                     <td th:text="${currentUser.firstName}">
 

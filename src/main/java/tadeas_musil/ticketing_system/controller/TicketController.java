@@ -31,6 +31,7 @@ import tadeas_musil.ticketing_system.entity.enums.Priority;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.service.CannedResponseService;
 import tadeas_musil.ticketing_system.service.DepartmentService;
+import tadeas_musil.ticketing_system.service.StaffService;
 import tadeas_musil.ticketing_system.service.TicketService;
 import tadeas_musil.ticketing_system.service.UserService;
 
@@ -43,9 +44,9 @@ public class TicketController {
 
     private final DepartmentService departmentService;
 
-    private final UserService userService;
-
     private final CannedResponseService cannedResponseService;
+
+    private final StaffService staffService;
 
     @GetMapping
     public String showTicketForm(Model model) {
@@ -81,7 +82,7 @@ public class TicketController {
     public String showTicket(@PathVariable Long ticketId, Model model) {
         model.addAttribute("ticket", ticketService.getById(ticketId));
         model.addAttribute("departments", departmentService.getAllDepartments());
-        model.addAttribute("staffMembers", userService.getAllStaffMembers());
+        model.addAttribute("staffMembers", staffService.getAllStaffMembers());
         model.addAttribute("cannedResponses", cannedResponseService.getAllResponses());
 
         if (!model.containsAttribute("response")) {

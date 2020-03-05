@@ -15,8 +15,6 @@ public interface UserService {
 
     User createUser(User user);
 
-    List<User> getAllStaffMembers();
-
     Page<User> getAllByRole(String role, Predicate predicate, Pageable pageable);
 
     void updateAccountStatus(Long id, boolean isDisabled);

@@ -1,8 +1,6 @@
 package tadeas_musil.ticketing_system.entity;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -13,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Email;
@@ -43,7 +40,9 @@ import tadeas_musil.ticketing_system.validation.UniqueUsername;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
     
-    public interface Registration {};
+    public interface Registration {}
+
+    public interface UpdateStaffMember {}
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -56,10 +55,10 @@ public class User {
     @EqualsAndHashCode.Include
     private String username;
 
-    @NotBlank(message = "Enter first name", groups = { Registration.class })
+    @NotBlank(message = "Enter first name", groups = { Registration.class, UpdateStaffMember.class })
     private String firstName;
     
-    @NotBlank(message = "Enter last name", groups = { Registration.class })
+    @NotBlank(message = "Enter last name", groups = { Registration.class, UpdateStaffMember.class })
     private String lastName;
 
     @NotBlank(message = "Enter password", groups = { Registration.class })
@@ -76,14 +75,6 @@ public class User {
                 joinColumns = @JoinColumn(name = "user_id"),
                 inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-
-    @OneToMany( cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinColumn(name = "user_id")
-    private List<Ticket> tickets = new ArrayList<>();
-
-    @OneToMany( cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinColumn(name = "user_id")
-    private List<TicketEvent> ticketEvents = new ArrayList<>();
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "app_user_department",

@@ -32,6 +32,6 @@ public interface UserRepository
 	@Query("UPDATE User u SET u.isDisabled = ?2 WHERE u.id = ?1")
   void setIsDisabled(Long ticketId, boolean isDisabled);
 
-	@Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.id = :id")
-  Optional<User> findByIdAndFetchRoles(Long id);
+  @Query("SELECT u FROM User u JOIN FETCH u.roles LEFT JOIN FETCH u.departments d WHERE u.id = :id")
+  Optional<User> findByIdAndFetchRolesAndDepartments(Long id);
 }
