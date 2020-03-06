@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ public class TicketTokenServiceTest {
     Ticket ticket = new Ticket();
     ticket.setId(Long.valueOf(5));
     
-    when(uuidHelper.randomUUID()).thenReturn("randomUUID");
+    when(uuidHelper.randomUUID()).thenReturn(UUID.fromString("randomUUID"));
     ReflectionTestUtils.setField(ticketTokenService, "tokenDuration", 24);
 
     ReflectionTestUtils.setField(localDateTimeHelper, "timezone", "UTC");

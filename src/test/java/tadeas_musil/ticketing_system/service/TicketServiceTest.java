@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +72,7 @@ public class TicketServiceTest {
     when(emailService.createStringFromTemplate(anyString(), anyMap())).thenReturn("message");
 
     TicketToken token = new TicketToken();
-    token.setToken("token");
+    token.setToken(UUID.fromString("token"));
     when(ticketTokenService.createToken(anyLong())).thenReturn(token);
 
     ticketService.sendTicketAccessEmail(Long.valueOf(5), "name@email.com");

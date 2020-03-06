@@ -69,10 +69,10 @@ public class TicketController {
             redirectAttributes.addFlashAttribute("ticket", ticket);
             return "redirect:/ticket";
         }
-        if (principal != null) {
-            ticket.setAuthor(principal.getName());
-        }
         Ticket createdTicket = ticketService.createTicket(ticket);
+        if (principal == null) {
+            return "ticket";
+        }
         return "redirect:/ticket/" + createdTicket.getId();
 
     }

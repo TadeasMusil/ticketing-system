@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 import tadeas_musil.ticketing_system.entity.Department;
@@ -52,10 +53,9 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketEventService ticketEventService;
 
-    public static final int TICKET_PAGE_SIZE = 10;
+    private static final int TICKET_PAGE_SIZE = 10;
 
-    @Value("${ticket.access_email.subject}")
-    private String accessEmailSubject;
+    private static final String TICKET_ACCESS_EMAIL_SUBJECT = "Temporary ticket access";
 
     /**
      * Creates a new token for the given ticket and sends a temporary link to
@@ -65,9 +65,10 @@ public class TicketServiceImpl implements TicketService {
         TicketToken token = ticketTokenService.createToken(ticketId);
         Map<String, Object> templateVariables = new HashMap<>();
         templateVariables.put("ticketId", ticketId);
-        templateVariables.put("ticketToken", token.getToken());
-        String emailText = emailService.createStringFromTemplate("templateName", templateVariables);
-        emailService.sendHtmlEmail(accessEmailSubject, email, emailText);
+        templateVariables.put("ticketToken", token.getToken().toString());
+        templateVariables.put("baseUrl", ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString());
+        String emailText = emailService.createStringFromTemplate("email/temporary-ticket-access", templateVariables);
+        emailService.sendHtmlEmail(TICKET_ACCESS_EMAIL_SUBJECT, email, emailText);
     }
 
     @Override

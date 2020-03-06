@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+    <div th:text="${'Here is a link for a ticket number #' + ticketId + '. Link is valid for 24 hours.'}">
+    </div>
+    <div>
+        <a th:href="@{__${baseUrl}__/ticket?token=__${ticketToken}__}">Take me to my ticket</a>
+    </div>
+</body>
+
+</html>

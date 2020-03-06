@@ -17,7 +17,7 @@
                             <h6> You will receive an email with a temporary link to your ticket </h6>
                         </div>
                         <!--    Form   -->
-                        <form th:action="@{/accessForm}" th:object="${ticketAccessForm}"
+                        <form th:action="@{/access-form}" th:object="${ticketAccessForm}"
                             method="POST" role="form" class="ticket-access-form">
                             <!--    ID field   -->
                             <div class="form-group">
@@ -36,6 +36,7 @@
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </form>
+                        <span th:if="${ticketLinkSuccessfullySent}">Email was sent to your email address</span>
                     </div>
                 </div>
 

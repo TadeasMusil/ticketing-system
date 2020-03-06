@@ -1,6 +1,7 @@
 package tadeas_musil.ticketing_system.entity;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,7 +32,7 @@ public class TicketToken {
 
     @NaturalId
     @EqualsAndHashCode.Include
-    private String token;
+    private UUID token;
 
     private LocalDateTime expiryDate;
 

@@ -22,7 +22,7 @@ import tadeas_musil.ticketing_system.service.TicketTokenService;
 import tadeas_musil.ticketing_system.validation.TicketAccessForm;
 
 @Controller
-@RequestMapping("/accessForm")
+@RequestMapping("/access-form")
 public class TicketAccessFormController {
 
     @Autowired
@@ -34,14 +34,14 @@ public class TicketAccessFormController {
     // Validates that the given ticketId and email are
     // matching and sends a link to the given email
     @PostMapping
-    public String processTicketAccessRequest(Authentication auth, @Valid @ModelAttribute TicketAccessForm ticketAccessForm,
+    public String processTicketAccessRequest(@Valid @ModelAttribute TicketAccessForm ticketAccessForm,
             BindingResult bindingResult, RedirectAttributes redirectAttributes) throws MessagingException {
         if (bindingResult.hasErrors()) {
             return "ticket-access-form";
         }
         ticketService.sendTicketAccessEmail(ticketAccessForm.getTicketId(), ticketAccessForm.getAuthorEmail());
-        redirectAttributes.addAttribute("ticketLinkSuccessfullySent", true);
-        return "redirect:/index";
+        redirectAttributes.addFlashAttribute("ticketLinkSuccessfullySent", true);
+        return "redirect:/access-form";
     }
     @GetMapping
     public String showTicketAccessForm(Model model) {

@@ -5,14 +5,11 @@ import javax.mail.MessagingException;
 import com.querydsl.core.types.Predicate;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
 import tadeas_musil.ticketing_system.entity.Department;
 import tadeas_musil.ticketing_system.entity.Ticket;
 import tadeas_musil.ticketing_system.entity.enums.Priority;
 
-@Service()
 public interface TicketService {
 
     Ticket createTicket(Ticket ticket);
