@@ -53,7 +53,7 @@ public class StaffController {
 
 		model.addAttribute("staffMember", userService.getById(id));
 		model.addAttribute("departments", departmentService.getAllDepartments());
-		return "fragments/create-ticket";
+		return "edit-staff";
 	}
 
 	@PostMapping("/{id}/department/add")
