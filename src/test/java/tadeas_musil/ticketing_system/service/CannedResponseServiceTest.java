@@ -35,7 +35,7 @@ public class CannedResponseServiceTest {
   public void getResponseByName_shouldThrowException_givenNonExistingName() {
     when(cannedResponseRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-    assertThrows(IllegalArgumentException.class, () -> cannedResponseService.getResponseById(Long.valueOf(1)));
+    assertThrows(IllegalArgumentException.class, () -> cannedResponseService.getResponseById(1L));
   }
 
   @Test
@@ -45,7 +45,7 @@ public class CannedResponseServiceTest {
 
     when(cannedResponseRepository.findById(anyLong())).thenReturn(Optional.of(response));
 
-    CannedResponse cannedResponse = cannedResponseService.getResponseById(Long.valueOf(1));
+    CannedResponse cannedResponse = cannedResponseService.getResponseById(1L);
 
     assertThat(cannedResponse).isEqualTo(response);
   }

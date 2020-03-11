@@ -33,7 +33,7 @@ public class TicketRepositoryTest {
         ticket.addEvent(event);
         ticket = ticketRepository.save(ticket);
        
-        Ticket result = ticketRepository.findByIdAndFetchEvents(Long.valueOf(1)).get();
+        Ticket result = ticketRepository.findByIdAndFetchEvents(1L).get();
 
         assertThat(result).hasFieldOrPropertyWithValue("author", "author");
         assertThat(result.getEvents()).hasSize(1)
@@ -48,8 +48,8 @@ public class TicketRepositoryTest {
         ticket.setPriority(Priority.LOW);
         ticket = ticketRepository.save(ticket);
 
-        ticketRepository.setPriority(Long.valueOf(1), Priority.HIGH);
-        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
+        ticketRepository.setPriority(1L, Priority.HIGH);
+        Ticket updatedTicket = ticketRepository.getOne(1L);
 
       assertThat(updatedTicket.getPriority()).isEqualTo(Priority.HIGH);
     }
@@ -69,8 +69,8 @@ public class TicketRepositoryTest {
         differentDepartment.setName("differentDepartmentName");
         differentDepartment = departmentRepository.save(differentDepartment);
 
-        ticketRepository.setDepartment(Long.valueOf(1), differentDepartment);
-        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
+        ticketRepository.setDepartment(1L, differentDepartment);
+        Ticket updatedTicket = ticketRepository.getOne(1L);
 
         assertThat(updatedTicket.getDepartment().getName()).isEqualTo(differentDepartment.getName());
     }
@@ -81,8 +81,8 @@ public class TicketRepositoryTest {
         ticket.setOwner("owner@email.com");
         ticketRepository.save(ticket);
 
-        ticketRepository.setOwner(Long.valueOf(1), "newOwner@email.com");
-        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
+        ticketRepository.setOwner(1L, "newOwner@email.com");
+        Ticket updatedTicket = ticketRepository.getOne(1L);
 
         assertThat(updatedTicket.getOwner()).isEqualTo("newOwner@email.com");
     }
@@ -93,8 +93,8 @@ public class TicketRepositoryTest {
         ticket.setClosed(false);
         ticketRepository.save(ticket);
 
-        ticketRepository.setIsClosed(Long.valueOf(1), true);
-        Ticket updatedTicket = ticketRepository.getOne(Long.valueOf(1));
+        ticketRepository.setIsClosed(1L, true);
+        Ticket updatedTicket = ticketRepository.getOne(1L);
 
         assertThat(updatedTicket.isClosed()).isEqualTo(true);
     }

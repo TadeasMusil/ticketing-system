@@ -27,8 +27,7 @@ public class TicketTokenServiceImpl implements TicketTokenService {
 
     private final LocalDateTimeHelper localDateTimeHelper;
 
-    @Value("${ticket_token.duration}")
-    private int tokenDuration;
+    private static int TOKEN_DURATION_HOURS = 24;
 
     @Override
     public TicketToken createToken(Long ticketId) {
@@ -41,7 +40,7 @@ public class TicketTokenServiceImpl implements TicketTokenService {
     }
 
     private LocalDateTime createExpiryDate() {
-        return localDateTimeHelper.getCurrentDateTime().plusHours(tokenDuration);
+        return localDateTimeHelper.getCurrentDateTime().plusHours(TOKEN_DURATION_HOURS);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class CannedResponseControllerTest {
         CannedResponse cannedResponse = new CannedResponse();
         cannedResponse.setName("responseName");
         cannedResponse.setContent("content");
-        cannedResponse.setId(Long.valueOf(1));
+        cannedResponse.setId(1L);
         
         when(cannedResponseService.getResponseById(anyLong())).thenReturn(cannedResponse);
         

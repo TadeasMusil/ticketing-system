@@ -30,7 +30,7 @@ public class EmailAndIdMatchValidatorTest {
     private TicketAccessForm getFormPassingAllValidations() {
         TicketAccessForm form = new TicketAccessForm();
         form.setAuthorEmail("user@email.com");
-        form.setTicketId(Long.valueOf(5));
+        form.setTicketId(5L);
         return form;
     }
 
@@ -86,7 +86,7 @@ public class EmailAndIdMatchValidatorTest {
     public void validation_shouldReturnError_givenNonMatchingTicketAndAuthor() {
         TicketAccessForm form = new TicketAccessForm();
         form.setAuthorEmail("name@mail.com");
-        form.setTicketId(Long.valueOf(5));
+        form.setTicketId(5L);
         Ticket ticket = new Ticket();
         ticket.setAuthor("noMatch@email.com");
 

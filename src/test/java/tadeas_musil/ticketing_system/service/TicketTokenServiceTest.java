@@ -51,10 +51,10 @@ public class TicketTokenServiceTest {
   @Test
   public void createTicketToken_shouldCreateTicketToken() throws Exception {
     Ticket ticket = new Ticket();
-    ticket.setId(Long.valueOf(5));
+    ticket.setId(5L);
     
-    when(uuidHelper.randomUUID()).thenReturn(UUID.fromString("randomUUID"));
-    ReflectionTestUtils.setField(ticketTokenService, "tokenDuration", 24);
+    UUID uuid = UUID.randomUUID();
+    when(uuidHelper.randomUUID()).thenReturn(uuid);
 
     ReflectionTestUtils.setField(localDateTimeHelper, "timezone", "UTC");
     when(localDateTimeHelper.getCurrentDateTime()).thenReturn(LocalDateTime.of(2000, 1, 1, 10, 30, 15));
@@ -64,7 +64,7 @@ public class TicketTokenServiceTest {
 
     TicketToken createdToken = ticketTokenService.createToken(ticket.getId());
 
-    assertThat(createdToken).hasFieldOrPropertyWithValue("token", "randomUUID")
+    assertThat(createdToken).hasFieldOrPropertyWithValue("token", uuid)
                             .hasFieldOrPropertyWithValue("ticket", ticket)
                             .hasFieldOrPropertyWithValue("expiryDate", LocalDateTime.of(2000, 1, 2, 10, 30, 15));
 
@@ -74,7 +74,7 @@ public class TicketTokenServiceTest {
   public void validateToken_shouldReturnFalse_givenNonExistingToken(){
     when(ticketTokenRepository.findByToken(anyString())).thenReturn(Optional.empty());
 
-    boolean isValid = ticketTokenService.validateToken(Long.valueOf(5), "nonExistingToken");
+    boolean isValid = ticketTokenService.validateToken(5L, "nonExistingToken");
     
     assertThat(isValid).isFalse();
   }
@@ -87,7 +87,7 @@ public class TicketTokenServiceTest {
     
     when(ticketTokenRepository.findByToken(anyString())).thenReturn(Optional.of(token));
 
-    boolean isValid = ticketTokenService.validateToken(Long.valueOf(5), "token");
+    boolean isValid = ticketTokenService.validateToken(5L, "token");
     
     assertThat(isValid).isFalse();
   }
@@ -95,7 +95,7 @@ public class TicketTokenServiceTest {
   @Test
   public void validateToken_shouldReturnFalse_givenNonMatchingId(){
     Ticket ticket = new Ticket();
-    ticket.setId(Long.valueOf(555555));
+    ticket.setId(555555L);
     TicketToken token = new TicketToken();
     token.setTicket(ticket);
     
@@ -104,7 +104,7 @@ public class TicketTokenServiceTest {
     
     when(ticketTokenRepository.findByToken(anyString())).thenReturn(Optional.of(token));
 
-    boolean isValid = ticketTokenService.validateToken(Long.valueOf(5), "token");
+    boolean isValid = ticketTokenService.validateToken(5L, "token");
     
     assertThat(isValid).isFalse();
   }
@@ -112,7 +112,7 @@ public class TicketTokenServiceTest {
   @Test
   public void validateToken_shouldReturnTrue_givenValidToken(){
     Ticket ticket = new Ticket();
-    ticket.setId(Long.valueOf(5));
+    ticket.setId(5L);
     TicketToken token = new TicketToken();
     token.setTicket(ticket);
     
@@ -121,7 +121,7 @@ public class TicketTokenServiceTest {
     
     when(ticketTokenRepository.findByToken(anyString())).thenReturn(Optional.of(token));
 
-    boolean isValid = ticketTokenService.validateToken(Long.valueOf(5), "token");
+    boolean isValid = ticketTokenService.validateToken(5L, "token");
     
     assertThat(isValid).isTrue();
   }

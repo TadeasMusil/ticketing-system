@@ -72,7 +72,7 @@ public class TicketControllerTest {
     public void creatingTicket_shouldCreateTicket_givenValidTicket() throws Exception{
         
         Ticket validTicket = new Ticket();
-        validTicket.setId(Long.valueOf(1));
+        validTicket.setId(1L);
         validTicket.setAuthor("author");
         validTicket.setSubject("subject");
         
@@ -135,7 +135,7 @@ public class TicketControllerTest {
                         .content(jsonPriority)
                         .with(csrf()))
                 .andExpect(status().isOk());
-        verify(ticketService).updatePriority(Long.valueOf(1), Priority.LOW);
+        verify(ticketService).updatePriority(1L, Priority.LOW);
     }
 
     @Test
@@ -208,7 +208,7 @@ public class TicketControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(ticketService).updateOwner(Long.valueOf(1), owner);
+        verify(ticketService).updateOwner(1L, owner);
     }
 
     @Test
@@ -239,7 +239,7 @@ public class TicketControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(ticketService).updateStatus(Long.valueOf(1), isClosed);
+        verify(ticketService).updateStatus(1L, isClosed);
     }
 
     @Test

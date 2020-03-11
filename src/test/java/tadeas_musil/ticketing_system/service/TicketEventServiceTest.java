@@ -51,12 +51,12 @@ public class TicketEventServiceTest {
   public void createEvent_shouldCreateEvent_givenAuthenticatedUser() {
     when(ticketEventRepository.save(any())).then(returnsFirstArg());
 
-    TicketEvent ticketEvent = ticketEventService.createEvent(Long.valueOf(1), TicketEventType.RESPONSE,
+    TicketEvent ticketEvent = ticketEventService.createEvent(1L, TicketEventType.RESPONSE,
         "Message content");
 
     assertThat(ticketEvent.getAuthor()).isEqualTo("username");
     assertThat(ticketEvent.getContent()).isEqualTo("Message content");
-    assertThat(ticketEvent.getTicket().getId()).isEqualTo(Long.valueOf(1));
+    assertThat(ticketEvent.getTicket().getId()).isEqualTo(1L);
     assertThat(ticketEvent.getType()).isEqualTo(TicketEventType.RESPONSE);
   }
 
@@ -64,7 +64,7 @@ public class TicketEventServiceTest {
   public void createEvent_shouldThrowException_givenUserNotAuthenticated() {
 
     assertThrows(AccessControlException.class,
-        () -> ticketEventService.createEvent(Long.valueOf(1), TicketEventType.RESPONSE, "Message content"));
+        () -> ticketEventService.createEvent(1L, TicketEventType.RESPONSE, "Message content"));
   }
 
   @Test

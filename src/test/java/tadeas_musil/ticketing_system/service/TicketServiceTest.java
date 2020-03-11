@@ -67,24 +67,10 @@ public class TicketServiceTest {
   }
 
   @Test
-  public void sendTicketAccessEmail_shouldSendEmail_givenCorrectData() throws Exception {
-    ReflectionTestUtils.setField(ticketService, "accessEmailSubject", "subject");
-    when(emailService.createStringFromTemplate(anyString(), anyMap())).thenReturn("message");
-
-    TicketToken token = new TicketToken();
-    token.setToken(UUID.fromString("token"));
-    when(ticketTokenService.createToken(anyLong())).thenReturn(token);
-
-    ticketService.sendTicketAccessEmail(Long.valueOf(5), "name@email.com");
-
-    verify(emailService).sendHtmlEmail("subject", "name@email.com", "message");
-  }
-
-  @Test
   public void getById_shouldThrowNoSuchElementException_givenNonExistingTicket() throws Exception {
     when(ticketRepository.findByIdAndFetchEvents(anyLong())).thenReturn(Optional.empty());
 
-    assertThrows(NoSuchElementException.class, () -> ticketService.getById(Long.valueOf(1)));
+    assertThrows(NoSuchElementException.class, () -> ticketService.getById(1L));
   }
 
   @Test
@@ -93,7 +79,7 @@ public class TicketServiceTest {
     ticket.setAuthor("author@email.com");
     when(ticketRepository.findByIdAndFetchEvents(anyLong())).thenReturn(Optional.of(ticket));
 
-    Ticket result = ticketService.getById(Long.valueOf(1));
+    Ticket result = ticketService.getById(1L);
 
     assertEquals("author@email.com", result.getAuthor());
   }
@@ -102,7 +88,7 @@ public class TicketServiceTest {
   @EnumSource(Priority.class)
   public void updatePriority_shouldUpdatePriority_givenValidPriority(Priority priority) throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
-    Long ticketId = Long.valueOf(1);
+    Long ticketId = 1L;
 
     ticketService.updatePriority(ticketId, priority);
 
@@ -115,14 +101,14 @@ public class TicketServiceTest {
   public void updatePriority_shouldThrowException_givenNonExistentTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
-    assertThrows(IllegalArgumentException.class, () -> ticketService.updatePriority(Long.valueOf(1), Priority.HIGH));
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updatePriority(1L, Priority.HIGH));
   }
 
   @Test
   public void updateDepartment_shouldUpdateDepartment_givenValidParameters() throws Exception {
     Department newDepartment = new Department();
     newDepartment.setName("departmentName");
-    Long ticketId = Long.valueOf(1);
+    Long ticketId = 1L;
 
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(departmentRepository.existsById(anyString())).thenReturn(true);
@@ -140,7 +126,7 @@ public class TicketServiceTest {
 
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
-    assertThrows(IllegalArgumentException.class, () -> ticketService.updateDepartment(Long.valueOf(5), newDepartment));
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateDepartment(5L, newDepartment));
   }
 
   @Test
@@ -151,7 +137,7 @@ public class TicketServiceTest {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(departmentRepository.existsById(anyString())).thenReturn(false);
 
-    assertThrows(IllegalArgumentException.class, () -> ticketService.updateDepartment(Long.valueOf(5), newDepartment));
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateDepartment(5L, newDepartment));
   }
 
   @Test
@@ -159,7 +145,7 @@ public class TicketServiceTest {
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
     assertThrows(IllegalArgumentException.class,
-        () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+        () -> ticketService.updateOwner(5L, "newOwner@email.com"));
   }
 
   @Test
@@ -168,7 +154,7 @@ public class TicketServiceTest {
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
     assertThrows(UsernameNotFoundException.class,
-        () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+        () -> ticketService.updateOwner(5L, "newOwner@email.com"));
   }
 
   @Test
@@ -183,7 +169,7 @@ public class TicketServiceTest {
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(newOwner));
 
     assertThrows(IllegalArgumentException.class,
-        () -> ticketService.updateOwner(Long.valueOf(5), "newOwner@email.com"));
+        () -> ticketService.updateOwner(5L, "newOwner@email.com"));
   }
 
   @ParameterizedTest
@@ -196,7 +182,7 @@ public class TicketServiceTest {
     newOwner.getRoles().add(role);
     newOwner.setUsername("newOwner@email.com");
 
-    Long ticketId = Long.valueOf(1);
+    Long ticketId = 1L;
 
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(newOwner));
@@ -210,7 +196,7 @@ public class TicketServiceTest {
   @Test
   public void updateStatus_shouldCloseTicket_givenExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
-    Long ticketId = Long.valueOf(1);
+    Long ticketId = 1L;
 
     ticketService.updateStatus(ticketId, true);
 
@@ -221,7 +207,7 @@ public class TicketServiceTest {
    @Test
   public void updateStatus_shouldReopenTicket_givenExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
-    Long ticketId = Long.valueOf(1);
+    Long ticketId = 1L;
 
     ticketService.updateStatus(ticketId, false);
 
@@ -233,20 +219,20 @@ public class TicketServiceTest {
   public void updateStatus_shouldThrowException_givenNonExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
-    assertThrows(IllegalArgumentException.class, () -> ticketService.updateStatus(Long.valueOf(5), true));
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateStatus(5L, true));
   }
 
   @Test
   public void createResponse_shouldThrowException_givenNonExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
-    assertThrows(IllegalArgumentException.class, () -> ticketService.createResponse(Long.valueOf(5), "content"));
+    assertThrows(IllegalArgumentException.class, () -> ticketService.createResponse(5L, "content"));
   }
 
   @Test
   public void createResponse_shouldcreateResponse_givenExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
-    Long ticketId = Long.valueOf(1);
+    Long ticketId = 1L;
     
     ticketService.createResponse(ticketId, "content");
 

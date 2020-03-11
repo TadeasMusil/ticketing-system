@@ -52,10 +52,10 @@ public class TicketAccessFormControllerTest {
     public void processingAccessRequest_shouldHaveErrors_givenInvalidForm() throws Exception{
         TicketAccessForm form = new TicketAccessForm();
         form.setAuthorEmail("name@email.com");
-        form.setTicketId(Long.valueOf(5));  
+        form.setTicketId(5L);  
         when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
-        mockMvc.perform(post("/accessForm")
+        mockMvc.perform(post("/access-form")
                     .flashAttr("ticketAccessForm", form)
                     .with(csrf()))
             .andExpect(status().isOk())
@@ -68,20 +68,20 @@ public class TicketAccessFormControllerTest {
     public void processingAccessRequest_shouldRedirectWithoutErrors_givenValidForm() throws Exception{
         TicketAccessForm form = new TicketAccessForm();
         form.setAuthorEmail("name@email.com");
-        form.setTicketId(Long.valueOf(5));
+        form.setTicketId(5L);
         
         Ticket ticket = new Ticket();
-        ticket.setId(Long.valueOf(5));
+        ticket.setId(5L);
         ticket.setAuthor("name@email.com");
         when(ticketRepository.existsById(anyLong())).thenReturn(true);
         when(ticketRepository.findById(anyLong())).thenReturn(Optional.of(ticket));
        
-       mockMvc.perform(post("/accessForm")
+       mockMvc.perform(post("/access-form")
                         .flashAttr("ticketAccessForm", form)
                         .with(csrf()))
            .andExpect(status().is3xxRedirection())
            .andExpect(model().hasNoErrors())
-           .andExpect(redirectedUrl("/index?ticketLinkSuccessfullySent=true"));
+           .andExpect(redirectedUrl("/access-form"));
            
     }
 
@@ -92,9 +92,9 @@ public class TicketAccessFormControllerTest {
 
     @Test
     public void checkTicketStatus_shouldShowTicket_givenValidToken() throws Exception{
-        when(ticketTokenService.validateToken(Long.valueOf(1), "uuidToken")).thenReturn(true);
+        when(ticketTokenService.validateToken(1L, "uuidToken")).thenReturn(true);
         Ticket ticket = new Ticket();
-        ticket.setId(Long.valueOf(1));
+        ticket.setId(1L);
         
         Department department = new Department();
         department.setName("departmentName");
@@ -102,7 +102,7 @@ public class TicketAccessFormControllerTest {
         
         when(ticketService.getById(anyLong())).thenReturn(ticket);
         
-        mockMvc.perform(post("/accessForm/ticket/1")
+        mockMvc.perform(post("/access-form/ticket/1")
                 .param("token", "uuidToken")
                 .with(csrf()))
            .andExpect(status().isOk())
@@ -115,7 +115,7 @@ public class TicketAccessFormControllerTest {
     public void checkTicketStatus_shouldShowError_givenInvalidToken() throws Exception{
         when(ticketTokenService.validateToken(anyLong(), anyString())).thenReturn(false);
 
-        assertThatThrownBy(() -> mockMvc.perform(post("/accessForm/ticket/1")
+        assertThatThrownBy(() -> mockMvc.perform(post("/access-form/ticket/1")
         .param("token", "uuidToken")
         .with(csrf())))
         .hasCauseExactlyInstanceOf(InvalidTicketTokenException.class);
