@@ -33,7 +33,7 @@ public class TicketRepositoryTest {
         ticket.addEvent(event);
         ticket = ticketRepository.save(ticket);
        
-        Ticket result = ticketRepository.findByIdAndFetchEvents(1L).get();
+        Ticket result = ticketRepository.findByIdAndFetchEvents(ticket.getId()).get();
 
         assertThat(result).hasFieldOrPropertyWithValue("author", "author");
         assertThat(result.getEvents()).hasSize(1)
