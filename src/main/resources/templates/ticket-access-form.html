@@ -17,12 +17,13 @@
                             <h6> You will receive an email with a temporary link to your ticket </h6>
                         </div>
                         <!--    Form   -->
-                        <form th:action="@{/access-form}" th:object="${ticketAccessForm}"
-                            method="POST" role="form" class="ticket-access-form">
+                        <form th:action="@{/access-form}" th:object="${ticketAccessForm}" method="POST" role="form"
+                            class="ticket-access-form">
                             <!--    ID field   -->
                             <div class="form-group">
                                 <label>Ticket ID</label>
-                                <input type="number" th:field="*{ticketId}" class="form-control" id="exampleInputEmail1">
+                                <input type="number" th:field="*{ticketId}" class="form-control"
+                                    id="exampleInputEmail1">
                             </div>
                             <!--    Email field   -->
                             <div class="form-group">

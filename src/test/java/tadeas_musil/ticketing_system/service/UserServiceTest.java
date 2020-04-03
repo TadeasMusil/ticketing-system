@@ -7,12 +7,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import tadeas_musil.ticketing_system.entity.PasswordResetToken;
 import tadeas_musil.ticketing_system.entity.Role;
 import tadeas_musil.ticketing_system.entity.User;
 import tadeas_musil.ticketing_system.repository.RoleRepository;
@@ -21,18 +23,29 @@ import tadeas_musil.ticketing_system.service.impl.UserServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-  @InjectMocks
-  private UserService userService = new UserServiceImpl();
+  
+  private UserService userService;
 
   @Mock
-    private UserRepository userRepository;
+  private UserRepository userRepository;
 
-    @Mock
-    private RoleRepository roleRepository;
+  @Mock
+  private RoleRepository roleRepository;
 
-    @Mock
-    private BCryptPasswordEncoder passwordEncoder;
+  @Mock
+  private BCryptPasswordEncoder passwordEncoder;
 
+  @Mock
+  private EmailService emailService;
+
+  @Mock
+  private TokenService<PasswordResetToken> passwordResetTokenService;
+
+  @BeforeEach
+  public void setUp() {
+    userService= new UserServiceImpl(userRepository, roleRepository, emailService, passwordResetTokenService, passwordEncoder);
+  }
+   
   @Test
   public void createUser_shouldReturnCorrectUser() throws Exception {
     User user = new User();
@@ -40,17 +53,17 @@ public class UserServiceTest {
     user.setLastName("lastName");
     user.setPassword("password");
     user.setUsername("name@email.com");
-    
+
     when(passwordEncoder.encode(anyString())).thenReturn("encryptedPassword");
     when(roleRepository.findByName(anyString())).thenReturn(new Role());
     when(userRepository.save(any(User.class))).then(returnsFirstArg());
-    
+
     User createdUser = userService.createUser(user);
 
     assertThat(createdUser).hasFieldOrPropertyWithValue("username", "name@email.com")
-                    .hasFieldOrPropertyWithValue("firstName", "firstName")
-                    .hasFieldOrPropertyWithValue("lastName", "lastName")
-                    .hasFieldOrPropertyWithValue("password", "encryptedPassword");
+                           .hasFieldOrPropertyWithValue("firstName", "firstName")
+                           .hasFieldOrPropertyWithValue("lastName", "lastName")
+                           .hasFieldOrPropertyWithValue("password", "encryptedPassword");
     assertThat(createdUser.getRoles()).hasSize(1);
   }
 }

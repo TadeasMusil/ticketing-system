@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <!--Anonymous user sidebar-->
+    <nav th:fragment="anonymous-user" class="menu">
+        <ul class="sidebar-menu metismenu" id="sidebar-menu">
+            <li class="active">
+                <a th:href="@{/}">
+                    <i class="fa fa-home"></i> Dashboard </a>
+            </li>
+            <li> 
+                <a href="">
+                    Tickets <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/ticket/access-form}"> Check ticket status </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/ticket}"> Create ticket </a>
+                    </li>
+                </ul>
+            </li>
+    </nav>
+    <!--Admin sidebar-->
+    <nav th:fragment="admin" class="menu">
+        <ul class="sidebar-menu metismenu" id="sidebar-menu">
+            <li class="active">
+                <a href="index.html">
+                    <i class="fa fa-home"></i> Dashboard </a>
+            </li>
+            <li>
+                <a href="">
+                    Ticket <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/ticket}"> Create ticket </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/ticket/my-tickets}"> My Tickets </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/ticket/assigned}"> Assigned Tickets </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/ticket/all}"> All Tickets </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="">
+                    Activity <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/activity/user}"> My Activity </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/activity/departments}"> My Departments Activity </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/activity/all}"> All Activity </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="">
+                    Users <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/user}"> Ban Users </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="">
+                    Staff <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/staff}"> Staff members </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="">
+                    Canned Responses <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/canned-response}"> Edit Responses </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="">
+                    Departments <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/department}"> Edit Departments </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="">
+                    Pages <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="reset.html"> Reset </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    </div>
+    <!--Staff sidebar-->
+    <nav th:fragment="staff" class="menu">
+        <ul class="sidebar-menu metismenu" id="sidebar-menu">
+            <li class="active">
+                <a href="index.html">
+                    <i class="fa fa-home"></i> Dashboard </a>
+            </li>
+            <li>
+                <a href="">
+                    Ticket <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/ticket}"> Create ticket </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/ticket/my-tickets}"> My Tickets </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="">
+                    Activity <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/activity/user}"> My Activity </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="">
+                    Pages <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="reset.html"> Reset </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    </div>
+    <!--User sidebar-->
+    <nav th:fragment="user" class="menu">
+        <ul class="sidebar-menu metismenu" id="sidebar-menu">
+            <li class="active">
+                <a href="index.html">
+                    <i class="fa fa-home"></i> Dashboard </a>
+            </li>
+            <li>
+                <a href="">
+                    Ticket <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/ticket}"> Create ticket </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/ticket/my-tickets}"> My Tickets </a>
+                    </li>
+                </ul>
+            </li> 
+            <li>
+                <a href="">
+                    Activity <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a th:href="@{/activity/user}"> My Activity </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="">
+                    Pages <i class="fa arrow"></i>
+                </a>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="reset.html"> Reset </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</body>
+
+</html>

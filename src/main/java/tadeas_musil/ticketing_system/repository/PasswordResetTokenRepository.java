@@ -6,10 +6,11 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import tadeas_musil.ticketing_system.entity.PasswordResetToken;
 import tadeas_musil.ticketing_system.entity.TicketToken;
 
 @Repository
-public interface TicketTokenRepository extends JpaRepository<TicketToken, Long> {
+public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
 
-  Optional<TicketToken> findByToken(UUID uuid);
+  Optional<PasswordResetToken> findByToken(UUID token);
 }

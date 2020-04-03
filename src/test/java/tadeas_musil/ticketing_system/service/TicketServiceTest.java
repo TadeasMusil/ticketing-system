@@ -36,6 +36,7 @@ import tadeas_musil.ticketing_system.repository.DepartmentRepository;
 import tadeas_musil.ticketing_system.repository.TicketRepository;
 import tadeas_musil.ticketing_system.repository.UserRepository;
 import tadeas_musil.ticketing_system.service.impl.TicketServiceImpl;
+import tadeas_musil.ticketing_system.service.impl.TicketTokenServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class TicketServiceTest {
@@ -44,7 +45,7 @@ public class TicketServiceTest {
   private EmailService emailService;
 
   @Mock
-  private TicketTokenService ticketTokenService;
+  private TicketTokenServiceImpl ticketTokenService;
 
   @Mock
   private TicketRepository ticketRepository;
@@ -94,7 +95,6 @@ public class TicketServiceTest {
 
     verify(ticketRepository).setPriority(ticketId, priority);
     verify(ticketEventService).createEvent(ticketId, TicketEventType.PRIORITY_CHANGE, priority.name());
-
   }
 
   @Test
@@ -144,8 +144,7 @@ public class TicketServiceTest {
   public void updateOwner_shouldThrowException_givenNonExistentTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(false);
 
-    assertThrows(IllegalArgumentException.class,
-        () -> ticketService.updateOwner(5L, "newOwner@email.com"));
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateOwner(5L, "newOwner@email.com"));
   }
 
   @Test
@@ -153,8 +152,7 @@ public class TicketServiceTest {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
-    assertThrows(UsernameNotFoundException.class,
-        () -> ticketService.updateOwner(5L, "newOwner@email.com"));
+    assertThrows(UsernameNotFoundException.class, () -> ticketService.updateOwner(5L, "newOwner@email.com"));
   }
 
   @Test
@@ -168,8 +166,7 @@ public class TicketServiceTest {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(newOwner));
 
-    assertThrows(IllegalArgumentException.class,
-        () -> ticketService.updateOwner(5L, "newOwner@email.com"));
+    assertThrows(IllegalArgumentException.class, () -> ticketService.updateOwner(5L, "newOwner@email.com"));
   }
 
   @ParameterizedTest
@@ -179,7 +176,8 @@ public class TicketServiceTest {
     role.setName(roleName);
 
     User newOwner = new User();
-    newOwner.getRoles().add(role);
+    newOwner.getRoles()
+            .add(role);
     newOwner.setUsername("newOwner@email.com");
 
     Long ticketId = 1L;
@@ -204,7 +202,7 @@ public class TicketServiceTest {
     verify(ticketEventService).createEvent(ticketId, TicketEventType.CLOSE, "CLOSED");
   }
 
-   @Test
+  @Test
   public void updateStatus_shouldReopenTicket_givenExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     Long ticketId = 1L;
@@ -233,7 +231,7 @@ public class TicketServiceTest {
   public void createResponse_shouldcreateResponse_givenExistingTicket() throws Exception {
     when(ticketRepository.existsById(anyLong())).thenReturn(true);
     Long ticketId = 1L;
-    
+
     ticketService.createResponse(ticketId, "content");
 
     verify(ticketEventService).createEvent(ticketId, TicketEventType.RESPONSE, "content");
